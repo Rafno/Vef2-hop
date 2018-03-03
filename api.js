@@ -8,6 +8,8 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
+  const data = req.body;
+  
   // POST með notendanafni og lykilorði skilar token
 });
 

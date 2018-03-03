@@ -1,5 +1,5 @@
 # Hópverkefni 1
-
+# Ekki gleyma, síðasta sem á að gera er að endurskrifa README eftir README kröfum.
 Útfæra skal vefþjónustu fyrir „bókasafn“ með notendaumsjón. Gefin eru gögn fyrir bækur og flokka.
 
 ## Notendaumsjón
