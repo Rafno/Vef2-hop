@@ -1,4 +1,4 @@
-book_title,book_author,book_description,ISBN10,ISBN13,book_release_date,book_pagenum,book_lang,book_categories
+book_title,book_author,book_description,ISBN10,ISBN13,book_release_date,book_pagenum,book_lang,categories_name
 1984,George Orwell,"Winston Smith is a worker at the Ministry of Truth, where he falsifies records for the party. Secretly subversive, he and his colleague Julia try to free themselves from political slavery but the price of freedom is betrayal.",451524934,9.78045E+12,,246,en,Science Fiction
 1Q84,Haruki Murakami,"The internationally best-selling and award-winning author of such works as What I Talk About When I Talk About Running presents a psychologically charged tale that draws on Orwellian themes. 100,000 first printing.",307593312,9.78031E+12,2011,925,en,Fiction
 "A Clash of Kings (A Song of Ice and Fire, #2)",George R. R. Martin,"With his estate divided and his family scattered, Lord Eddard Stark returns to his territory to fight an ancient spell that is slowly devouring what is left of his land. Reprint.",553381695,9.78055E+12,1999,761,en,Fantasy
