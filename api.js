@@ -7,9 +7,8 @@ router.post('/register', (req, res) => {
   // POST býr til notanda og skilar án lykilorðs hash
 });
 
-router.post('/login', (req, res) => {
-  const data = req.body;
-  
+router.post('/login', (req, res, next) => {
+  const { username, password } = req.body;
   // POST með notendanafni og lykilorði skilar token
 });
 

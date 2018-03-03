@@ -12,7 +12,13 @@ const connectionString = process.env.DATABASE_URL;
  * module.exports, sem leyfir okkur að nota föll annarstaðar.
  */
 async function query(q, values = []) {
-  const client = new Client({ connectionString });
+  // const client = new Client({ connectionString });
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'MK301554',
+  });
   await client.connect();
 
   let result;
