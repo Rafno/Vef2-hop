@@ -1,11 +1,13 @@
 const bcrypt = require('bcrypt');
 const { Client } = require('pg');
+const fs = require('fs');
+const util = require('util');
 
 const connectionString = process.env.DATABASE_URL;
 /**
  * USERS tekið frá Óla dæmi
  * TODO:
- * Bæta við XSS, skoða hvaða föll eru óþarfi, hvaða þarf að bæta við.
+ * Bæta við XSS?, skoða hvaða föll eru óþarfi, hvaða þarf að bæta við.
  * öll föll sem eiga að vera notuð í öðrum hluta þarf að vera bætt við í
  * module.exports, sem leyfir okkur að nota föll annarstaðar.
  */

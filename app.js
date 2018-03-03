@@ -5,6 +5,8 @@ const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const users = require('./users');
+
+const books = ('./data/');
 /**
  * APP tekið frá Óla dæmi.
  * Býr til token sem leyfir aðila að vera innskráður í spes mikinn tíma (óviss hversu langur)
