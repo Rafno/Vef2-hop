@@ -1,39 +1,74 @@
 const bcrypt = require('bcrypt');
+const { Client } = require('pg');
 
-const records = [
-  {
-    id: 1,
-    username: 'admin',
-    password: '$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii',
-    name: 'Stjórnandi',
-  },
-];
+const connectionString = process.env.DATABASE_URL;
+/**
+ * USERS tekið frá Óla dæmi
+ * TODO:
+ * Bæta við XSS, skoða hvaða föll eru óþarfi, hvaða þarf að bæta við.
+ * öll föll sem eiga að vera notuð í öðrum hluta þarf að vera bætt við í
+ * module.exports, sem leyfir okkur að nota föll annarstaðar.
+ */
+async function query(q, values = []) {
+  const client = new Client({ connectionString });
+  await client.connect();
 
-exports.comparePasswords = (hash, user) =>
-  bcrypt.compare(hash, user.password)
-    .then((res) => {
-      if (res) {
-        return user;
-      }
-      return false;
-    });
+  let result;
 
-exports.findByUsername = username => new Promise((resolve) => {
-  const found = records.find(u => u.username === username);
-
-  if (found) {
-    return resolve(found);
+  try {
+    result = await client.query(q, values);
+  } catch (err) {
+    throw err;
+  } finally {
+    await client.end();
   }
 
-  return resolve(null);
-});
+  return result;
+}
 
-exports.findById = id => new Promise((resolve) => {
-  const found = records.find(u => u.id === id);
+async function comparePasswords(hash, password) {
+  const result = await bcrypt.compare(hash, password);
 
-  if (found) {
-    return resolve(found);
+  return result;
+}
+
+async function findByUsername(username) {
+  const q = 'SELECT * FROM users WHERE username = $1';
+
+  const result = await query(q, [username]);
+
+  if (result.rowCount === 1) {
+    return result.rows[0];
   }
 
-  return resolve(null);
-});
+  return null;
+}
+
+async function findById(id) {
+  const q = 'SELECT * FROM users WHERE id = $1';
+
+  const result = await query(q, [id]);
+
+  if (result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+async function createUser(username, password) {
+  const hashedPassword = await bcrypt.hash(password, 11);
+
+  const q = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
+
+  const result = await query(q, [username, hashedPassword]);
+
+  return result.rows[0];
+}
+
+module.exports = {
+  comparePasswords,
+  findByUsername,
+  findById,
+  createUser,
+}
