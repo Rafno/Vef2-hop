@@ -1,9 +1,10 @@
 require('dotenv').config();
 const express = require('express');
+const passport = require('passport');
 
 const app = express();
 
-app.use(express.json());
+
 
 /**
  * TODO, vinna meira med app.
