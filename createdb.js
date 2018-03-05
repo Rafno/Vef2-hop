@@ -2,8 +2,36 @@ require('dotenv').config();
 
 const fs = require('fs');
 const util = require('util');
-
+const csv = require('csvtojson');
 const { Client } = require('pg');
+
+const csvFilePath = '.\data\books.csv';
+
+let csvFile = {
+  "books": [
+    {
+      "title": title,
+      "author": author,
+      "description": description,
+      "isbn10": isbn10,
+      "isbn113": isbn13,
+      "published": published,
+      "pagecount": pagecount,
+      "language": language,
+      "category": category
+    },
+  ]
+};
+csv()
+  .fromFile(csvFilePath)
+  .on('json', (jsonObj) => {
+    
+    // combine csv header row and csv line to a json object
+    // jsonObj.a ==> 1 or 4
+  })
+  .on('done', (error) => {
+    console.log('end')
+  })
 
 const connectionString = process.env.DATABASE_URL;
 
