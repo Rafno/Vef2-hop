@@ -43,13 +43,13 @@ UNIQUE(categories_name)
 */
 create table books(
 id serial primary key,
-title varchar(99) NOT NULL CHECK (title <> ''),
+title varchar(999) NOT NULL CHECK (title <> ''),
 author varchar(99),
 description TEXT,
 isbn10 varchar(99),
 isbn13 char(13) NOT NULL,
 published varchar(99),
-pagecount INT,
+pagecount varchar(99),
 language char(2),
 category varchar(99) NOT NULL,
 UNIQUE(title),
