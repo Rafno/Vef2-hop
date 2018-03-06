@@ -1,6 +1,6 @@
 {
   "name": "hopv1",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "eslint": "eslint *.js **/*.js",
@@ -14,7 +14,6 @@
   "dependencies": {
     "bcrypt": "^1.0.3",
     "cookie-parser": "^1.4.3",
-    "csvtojson": "^1.1.9",
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
     "express-csv": "^0.6.0",

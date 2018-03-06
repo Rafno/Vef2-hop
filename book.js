@@ -10,7 +10,7 @@ async function getCategories() {
         user: 'postgres',
         host: 'localhost',
         database: 'library',
-        password: 'Pluto050196',
+        password: 'MK301554',
       });
       await client.connect();
   const gogn = await client.query(

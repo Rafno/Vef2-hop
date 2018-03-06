@@ -16,8 +16,8 @@ async function query(q, values = []) {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'postgres',
-    password: 'Pluto050196',
+    database: 'library',
+    password: 'MK301554',
   });
   await client.connect();
 
