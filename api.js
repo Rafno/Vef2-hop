@@ -2,27 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 const users = require('./users');
+const book = require('./book');
 router.use(express.json());
 
-// föll sem er hægt að kalla á í books.js
-const {
-  getCategories,
-  postCategories,
-  getbooks,
-  postbooks,
-  getbooksSearch,
-  getBooksId,
-  patchBooksId,
-} = require('./book');
 // Föll sem er hægt að kalla á í users.js
 
 
 /* -------------- Villumeðhöndlun -----------------------*/
-function getCategoriesError(gogn){
-  if (typeof (gogn.categories_name !== 'string')){
-    return false;
+function postCategoriesError(gogn){
+  console.log(typeof(gogn));
+  if (typeof (gogn) === 'string'){
+    console.log("kemstu inn")
+    return true;
   }
-  return true;
+  return false;
 }
 
 // Allir routerar settir í sömu röð og gefið í dæminu.
@@ -57,7 +50,6 @@ router.post(
     const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
     return res.json({ token });
   }
-
   return res.status(401).json({ error: 'Invalid password' });
 });
 
@@ -87,27 +79,38 @@ router.get(
   '/categories',
   async (req, res) => {
     console.log("hallío");
-    const data = await getCategories();
+    const data = await book.getCategories();
     res.status(200).json({data});
 });
+
+// POST býr til nýjan flokk
 router.post(
   '/categories',
-  (req, res) => {
+  async (req, res) => {
     const data = req.body;
-    if (getCategoriesError(data) === true){
-      console.log("hey");
-      const skjol = await book.postCategories(20);
-      res.status(201).json({skjol});
+    if(postCategoriesError(data.categories_name) === true){
+      const gogn = await book.postCategories({
+        categories_name:data.categories_name,
+      });
+      if(gogn !== null){
+        res.status(201).json({data});
+      } else {
+        res.status(400).json({categories_name: " This name is not valid because it's already in the table"});
+      }
     } else {
       res.status(400).json({
-        categories_name:" Sorry categories name can only include String types "
+        categories_name:" Sorry the name of the categories must be a string"
       });
+    }
   }
-  // POST býr til nýjan flokk og skilar þeirri færslu.
-});
+);
 
-router.get('/books', (req, res) => {
-  // GET skilar síðu af bókum
+// GET skilar síðu af bókum
+router.get(
+  '/books',
+  async (req, res) => {
+    const data = await book.getBooks();
+    res.status(200).json({data});
 });
 router.post('/books', (req, res) => {
   // POST býr til nýja bók ef hún er gild og skilar
@@ -132,6 +135,7 @@ router.get('/users/:id/read', (req, res) => {
 router.get('/users/me/read', (req, res) => {
   // GET skilar síðu af lesnum bókum innskráðs notanda
 });
+/* Rafnar geriri*/
 router.post('/users/me/read', (req, res) => {
   // POST býr til nýjan lestur á bók og skilar
 });
