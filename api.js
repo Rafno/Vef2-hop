@@ -13,6 +13,16 @@ const {
   getBooksId,
   patchBooksId,
 } = require('./book');
+// Föll sem er hægt að kalla á í users.js
+
+
+/* -------------- Villumeðhöndlun -----------------------*/
+function getCategoriesError(gogn){
+  if (typeof (gogn.categories_name !== 'string')){
+    return false;
+  }
+  return true;
+}
 
 // Allir routerar settir í sömu röð og gefið í dæminu.
 router.post('/register', (req, res) => {
@@ -53,8 +63,20 @@ router.get(
     const data = await getCategories();
     res.status(200).json({data});
 });
-router.post('/categories', (req, res) => {
-  // POST býr til nýjan flokk og skilar
+router.post(
+  '/categories',
+  (req, res) => {
+    const data = req.body;
+    if (getCategoriesError(data) === true){
+      console.log("hey");
+      const skjol = await book.postCategories(20);
+      res.status(201).json({skjol});
+    } else {
+      res.status(400).json({
+        categories_name:" Sorry categories name can only include String types "
+      });
+  }
+  // POST býr til nýjan flokk og skilar þeirri færslu.
 });
 
 router.get('/books', (req, res) => {
