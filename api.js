@@ -1,15 +1,9 @@
 const express = require('express');
-
 const router = express.Router();
+
+const users = require('./users');
 router.use(express.json());
 
-// föll sem hægt að kalla á í users.js
-const {
-  comparePasswords,
-  findByUsername,
-  findById,
-  createUser,
-} = require('./users');
 // föll sem er hægt að kalla á í books.js
 const {
   getCategories,
@@ -22,18 +16,22 @@ const {
 } = require('./book');
 
 // Allir routerar settir í sömu röð og gefið í dæminu.
-router.post('/register', (req, res) => {
-  const { username, password } = req.body;
+router.post(
+  '/register',
+  async (req, res) => {
+  const { username, password, name } = req.body;
   const user = await users.findByUsername(username);
 
   if (user) {
     return res.status(401).json({ error: 'User already exists' });
   }
-  const registeredUser = await createUser(username, password);
+  const registeredUser = await users.createUser(username, password, name);
   return res.status(201).json({ Success: username + 'has been created' });
 });
 
-router.post('/login', (req, res, next) => {
+router.post(
+  '/login',
+  async (req, res) => {
   const { username, password } = req.body;
 
   const user = await users.findByUsername(username);
@@ -41,7 +39,7 @@ router.post('/login', (req, res, next) => {
   if (!user) {
     return res.status(401).json({ error: 'No such user' });
   }
-  const passwordIsCorrect = await users.comparePasswords(password, user.password);
+  const passwordIsCorrect = await comparePasswords(password, user.password);
 
   if (passwordIsCorrect) {
     const payload = { id: user.id };

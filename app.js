@@ -97,11 +97,11 @@ function requireAuthentication(req, res, next) {
     }
   )(req, res, next);
 }
-*/
+
 app.get('/admin', requireAuthentication, (req, res) => {
   res.json({ data: 'top secret' });
 });
-
+*/
 function notFoundHandler(req, res, next) { // eslint-disable-line
   res.status(404).json({ error: 'Not found' });
 }
