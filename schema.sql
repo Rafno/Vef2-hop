@@ -1,5 +1,5 @@
 /* HVERNIG SKAL NOTA BOOKS
-* SELECT og kasta tomum streng i null
+* kasta tomum streng i null
 * SELECT CASE WHEN pagecount='' THEN NULL ELSE pagecount::integer END FROM books;
 * copy-a tofluna i gagnagrunninn
 * copy books (title, author, description, isbn10, isbn13, published, pagecount, language, category) FROM 'C:\\Users\\Sixsmith\\Desktop\\Vef2-hop\\data\\books.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' ESCAPE '''';
