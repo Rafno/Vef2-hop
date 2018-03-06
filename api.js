@@ -6,7 +6,14 @@ router.use(express.json());
 // föll sem er hægt að kalla á í books.js
 const {
   getCategories,
-} = require('./books');
+  postCategories,
+  getbooks,
+  postbooks,
+  getbooksSearch,
+  getBooksId,
+  patchBooksId,
+} = require('./book');
+
 // Allir routerar settir í sömu röð og gefið í dæminu.
 router.post('/register', (req, res) => {
     
@@ -53,8 +60,13 @@ router.post('/users/me/profile', (req, res) => {
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
 
-router.get('/categories', (req, res) => {
-  // GET skilar síðu af flokkum
+// GET skilar síðu af flokkum
+router.get(
+  '/categories',
+  async (req, res) => {
+    console.log("hallío");
+    const data = await getCategories();
+    res.status(200).json({data});
 });
 router.post('/categories', (req, res) => {
   // POST býr til nýjan flokk og skilar

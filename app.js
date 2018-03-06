@@ -5,7 +5,9 @@ const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const users = require('./users');
-
+const app = express();
+const api = require('./api');
+app.use('/', api);
 const books = ('./data/');
 /**
  * APP tekið frá Óla dæmi.
@@ -28,7 +30,6 @@ if (!jwtSecret) {
   process.exit(1);
 }
 
-const app = express();
 app.use(express.json());
 
 const jwtOptions = {
