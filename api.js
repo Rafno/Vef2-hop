@@ -1,10 +1,27 @@
 const express = require('express');
 const router = express.Router();
-
+const passport = require('passport');
+const { Strategy, ExtractJwt } = require('passport-jwt');
+const jwt = require('jsonwebtoken');
 const users = require('./users');
+<<<<<<< HEAD
 const book = require('./book');
 router.use(express.json());
 
+=======
+const app = require('./app');
+router.use(express.json());
+// föll sem er hægt að kalla á í books.js
+const {
+  getCategories,
+  postCategories,
+  getbooks,
+  postbooks,
+  getbooksSearch,
+  getBooksId,
+  patchBooksId,
+} = require('./book');
+>>>>>>> fa001269700c26e49235950e9228e3b1c34fa099
 // Föll sem er hægt að kalla á í users.js
 
 
@@ -18,7 +35,23 @@ function postCategoriesError(gogn){
   return false;
 }
 
+const {
+  PORT: port = 3000,
+  JWT_SECRET: jwtSecret,
+  TOKEN_LIFETIME: tokenLifetime = 20,
+} = process.env;
+
+if (!jwtSecret) {
+  console.error('JWT_SECRET not registered in .env');
+  process.exit(1);
+}
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret,
+}
+
 // Allir routerar settir í sömu röð og gefið í dæminu.
+// TODO, þarf að geta tekið inn mynd.
 router.post(
   '/register',
   async (req, res) => {
@@ -31,7 +64,23 @@ router.post(
   const registeredUser = await users.createUser(username, password, name);
   return res.status(201).json({ Success: username + 'has been created' });
 });
+// TODO, setja token a betri stad.
+function strat() {
+  users
+    .findByUsername(username)
+    .then((user) => {
+      if (!user) {
+        return done(null, false);
+      }
 
+      return users.comparePasswords(password, user);
+    })
+    .then(res => done(null, res))
+    .catch((err) => {
+      done(err);
+    });
+}
+passport.use(new Strategy(jwtOptions, strat));
 router.post(
   '/login',
   async (req, res) => {
@@ -42,7 +91,7 @@ router.post(
   if (!user) {
     return res.status(401).json({ error: 'No such user' });
   }
-  const passwordIsCorrect = await comparePasswords(password, user.password);
+  const passwordIsCorrect = await users.comparePasswords(password, user.password);
 
   if (passwordIsCorrect) {
     const payload = { id: user.id };
@@ -53,14 +102,25 @@ router.post(
   return res.status(401).json({ error: 'Invalid password' });
 });
 
-router.get('/users', (req, res) => {
   // GET skilar stökum notanda ef til
   // Lykilorðs hash skal ekki vera sýnilegt
+router.get('/users',
+  async (req, res) => {
+    const results = await users.findAll();
+    return res.status(200).json({ results });
 });
 
-router.get('/users/:id', (req, res) => {
   // GET skilar stökum notanda ef til
   // Lykilorðs hash skal ekki vera sýnilegt
+router.get('/users/:id',
+  async (req, res) => {
+    const { id } = req.params;
+    const data = await users.findById(id);
+    if (!data) {
+      return res.status(401).json({ error: 'User does not exist' });
+    }
+    return res.status(200).json({data})
+
 });
 
 router.get('/users/me', (req, res) => {

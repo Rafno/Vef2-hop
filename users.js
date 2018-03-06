@@ -51,9 +51,17 @@ async function findByUsername(username) {
 
   return null;
 }
+async function findAll() {
+  const q = 'SELECT username, name FROM users';
 
+  const result = await query(q, []);
+  if (result.rowCount > 0) {
+    return result.rows;
+  }
+  return null;
+}
 async function findById(id) {
-  const q = 'SELECT * FROM users WHERE id = $1';
+  const q = 'SELECT id, username, name FROM users WHERE id = $1';
 
   const result = await query(q, [id]);
 
@@ -78,5 +86,6 @@ module.exports = {
   comparePasswords,
   findByUsername,
   findById,
+  findAll,
   createUser,
 }
