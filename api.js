@@ -9,12 +9,27 @@ const {
 } = require('./books');
 // Allir routerar settir í sömu röð og gefið í dæminu.
 router.post('/register', (req, res) => {
-  // POST býr til notanda og skilar án lykilorðs hash
+    
 });
 
 router.post('/login', (req, res, next) => {
   const { username, password } = req.body;
-  // POST með notendanafni og lykilorði skilar token
+
+  const user = await users.findByUsername(username);
+
+  if (!user) {
+    return res.status(401).json({ error: 'No such user' });
+  }
+  const passwordIsCorrect = await users.comparePasswords(password, user.password);
+
+  if (passwordIsCorrect) {
+    const payload = { id: user.id };
+    const tokenOptions = { expiresIn: tokenLifetime };
+    const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
+    return res.json({ token });
+  }
+
+  return res.status(401).json({ error: 'Invalid password' });
 });
 
 router.get('/users', (req, res) => {
