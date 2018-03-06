@@ -34,6 +34,22 @@ id serial primary key,
 categories_name varchar(99) NOT NULL CHECK (categories_name <> ''),
 UNIQUE(categories_name)
 );
+/*
+ * Inser skipanir fyrir töfluna categories
+*/
+insert into categories(categories_name) Values('Fiction');
+insert into categories(categories_name) Values('Nonfiction');
+insert into categories(categories_name) Values('Science Fiction');
+insert into categories(categories_name) Values('Fantasy');
+insert into categories(categories_name) Values('Comic');
+insert into categories(categories_name) Values('Psychology');
+insert into categories(categories_name) Values('Design');
+insert into categories(categories_name) Values('Horror');
+insert into categories(categories_name) Values('Economics');
+insert into categories(categories_name) Values('Graphic Novel');
+insert into categories(categories_name) Values('Business');
+insert into categories(categories_name) Values('Computer Science');
+
 
 /* ++++++++++ 3 tafla lï¿½ï¿½sing ++++++++++
  * Bï¿½kur
