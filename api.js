@@ -2,6 +2,11 @@ const express = require('express');
 
 const router = express.Router();
 router.use(express.json());
+
+// föll sem er hægt að kalla á í books.js
+const {
+  getCategories,
+} = require('./books');
 // Allir routerar settir í sömu röð og gefið í dæminu.
 router.post('/register', (req, res) => {
   // POST býr til notanda og skilar án lykilorðs hash
