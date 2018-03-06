@@ -4,24 +4,9 @@ const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const users = require('./users');
-<<<<<<< HEAD
 const book = require('./book');
 router.use(express.json());
 
-=======
-const app = require('./app');
-router.use(express.json());
-// föll sem er hægt að kalla á í books.js
-const {
-  getCategories,
-  postCategories,
-  getbooks,
-  postbooks,
-  getbooksSearch,
-  getBooksId,
-  patchBooksId,
-} = require('./book');
->>>>>>> fa001269700c26e49235950e9228e3b1c34fa099
 // Föll sem er hægt að kalla á í users.js
 
 
