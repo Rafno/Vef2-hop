@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
     admin: '/admin',
   });
 });
-
+/*
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -101,7 +101,7 @@ function requireAuthentication(req, res, next) {
 app.get('/admin', requireAuthentication, (req, res) => {
   res.json({ data: 'top secret' });
 });
-
+*/
 function notFoundHandler(req, res, next) { // eslint-disable-line
   res.status(404).json({ error: 'Not found' });
 }

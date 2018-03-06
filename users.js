@@ -3,7 +3,7 @@ const { Client } = require('pg');
 const fs = require('fs');
 const util = require('util');
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL || 'library://:@localhost/postgres';
 /**
  * USERS tekið frá Óla dæmi
  * TODO:
@@ -16,8 +16,8 @@ async function query(q, values = []) {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
-    database: 'postgres',
-    password: 'Pluto050196',
+    database: 'library',
+    password: 'MK301554',
   });
   await client.connect();
 
@@ -64,12 +64,12 @@ async function findById(id) {
   return null;
 }
 
-async function createUser(username, password) {
+async function createUser(username, password, name) {
   const hashedPassword = await bcrypt.hash(password, 11);
 
-  const q = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
+  const q = 'INSERT INTO users (username, password, name) VALUES ($1, $2, $3) RETURNING *';
 
-  const result = await query(q, [username, hashedPassword]);
+  const result = await query(q, [username, hashedPassword, name]);
 
   return result.rows[0];
 }

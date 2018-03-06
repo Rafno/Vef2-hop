@@ -1,6 +1,7 @@
 const express = require('express');
-
 const router = express.Router();
+
+const users = require('./users');
 router.use(express.json());
 
 // föll sem er hægt að kalla á í books.js
@@ -25,13 +26,39 @@ function getCategoriesError(gogn){
 }
 
 // Allir routerar settir í sömu röð og gefið í dæminu.
-router.post('/register', (req, res) => {
-  // POST býr til notanda og skilar án lykilorðs hash
+router.post(
+  '/register',
+  async (req, res) => {
+  const { username, password, name } = req.body;
+  const user = await users.findByUsername(username);
+
+  if (user) {
+    return res.status(401).json({ error: 'User already exists' });
+  }
+  const registeredUser = await users.createUser(username, password, name);
+  return res.status(201).json({ Success: username + 'has been created' });
 });
 
-router.post('/login', (req, res, next) => {
+router.post(
+  '/login',
+  async (req, res) => {
   const { username, password } = req.body;
-  // POST með notendanafni og lykilorði skilar token
+
+  const user = await users.findByUsername(username);
+
+  if (!user) {
+    return res.status(401).json({ error: 'No such user' });
+  }
+  const passwordIsCorrect = await comparePasswords(password, user.password);
+
+  if (passwordIsCorrect) {
+    const payload = { id: user.id };
+    const tokenOptions = { expiresIn: tokenLifetime };
+    const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
+    return res.json({ token });
+  }
+
+  return res.status(401).json({ error: 'Invalid password' });
 });
 
 router.get('/users', (req, res) => {
