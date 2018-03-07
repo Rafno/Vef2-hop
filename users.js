@@ -61,7 +61,7 @@ async function findAll() {
   return null;
 }
 async function findById(id) {
-  const q = 'SELECT id, username, name FROM users WHERE id = $1';
+  const q = 'SELECT id, username, password FROM users WHERE id = $1';
 
   const result = await query(q, [id]);
 

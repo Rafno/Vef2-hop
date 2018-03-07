@@ -30,7 +30,6 @@ csv()
     // jsonObj.a ==> 1 or 4
   })
   .on('done', (error) => {
-    console.log('end')
   })
 
 const connectionString = process.env.DATABASE_URL;
