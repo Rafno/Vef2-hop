@@ -194,6 +194,11 @@ router.patch('/users/me', (req, res) => {
 });
 
 router.post('/users/me/profile', (req, res) => {
+  console.log("halló");
+  const slod = req.body.key;
+  console.log(req.body);
+  const a = req.body;
+  console.log(a);
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
 
@@ -264,7 +269,10 @@ router.post(
 
 // Skoða betur, óviss hvernig ?search=query virkar.
 router.get('/books?search=query', (req, res) => {
+  console.log("kemst inn í leita");
   // GET skilar síðu af bókum sem uppfylla leitarskilyrði, sjá að neðan
+  const { leit  } = req.params;
+  console.log(leit);
 });
 
 router.get(
