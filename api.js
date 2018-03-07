@@ -190,7 +190,12 @@ router.patch('/users/me', requireAuthentication, (req, res) => {
   // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn, þ.e.a.s. nafn eða lykilorð, ef þau eru gild
 });
 
-router.post('/users/me/profile', requireAuthentication, (req, res) => {
+router.post('/users/me/profile', (req, res) => {
+  console.log("halló");
+  const slod = req.body.key;
+  console.log(req.body);
+  const a = req.body;
+  console.log(a);
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
 
@@ -258,9 +263,11 @@ router.post(
   });
 
 // Skoða betur, óviss hvernig ?search=query virkar.
-router.get('/books?search=query', requireAuthentication,
-  (req, res) => {
+router.get('/books?search=query', (req, res) => {
+  console.log("kemst inn í leita");
   // GET skilar síðu af bókum sem uppfylla leitarskilyrði, sjá að neðan
+  const { leit  } = req.params;
+  console.log(leit);
 });
 
 router.get(
