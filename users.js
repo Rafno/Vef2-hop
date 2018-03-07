@@ -17,7 +17,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'Pluto050196',
+    password: 'MK301554',
   });
   await client.connect();
 
@@ -61,7 +61,7 @@ async function findAll() {
   return null;
 }
 async function findById(id) {
-  const q = 'SELECT id, username, password FROM users WHERE id = $1';
+  const q = 'SELECT id, username,password,name FROM users WHERE id = $1';
 
   const result = await query(q, [id]);
 
@@ -81,6 +81,15 @@ async function createUser(username, password, name) {
 
   return result.rows[0];
 }
+async function editUser(id, username, password, name) {
+  if (!findById(id)) {
+    return null;
+  }
+  const hashedPassword = await bcrypt.hash(password, 11);
+  const q = 'UPDATE users SET username = $1, password = $2, name = $3 WHERE id = $4;';
+  const result = await query(q, [username, hashedPassword, name, id]);
+  return result.rows[0];
+}
 
 module.exports = {
   comparePasswords,
@@ -88,4 +97,5 @@ module.exports = {
   findById,
   findAll,
   createUser,
+  editUser,
 }
