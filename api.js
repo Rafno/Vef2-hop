@@ -57,21 +57,15 @@ router.post(
   return res.status(201).json({ Success: username + 'has been created' });
 });
 // TODO, setja token a betri stad.
-function strat() {
-  users
-    .findByUsername(username)
-    .then((user) => {
-      if (!user) {
-        return done(null, false);
-      }
+async function strat(data, next) {
+  const user = await users.findById(data.id);
 
-      return users.comparePasswords(password, user);
-    })
-    .then(res => done(null, res))
-    .catch((err) => {
-      done(err);
-    });
-}
+  if (user) {
+    next(null, user);
+  } else {
+    next(null, false);
+  }
+};
 passport.use(new Strategy(jwtOptions, strat));
 router.post(
   '/login',
@@ -94,7 +88,25 @@ router.post(
 
   return res.status(401).json({ error: 'Invalid password' });
 });
+function requireAuthentication(req, res, next) {
+  return passport.authenticate(
+    'jwt',
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
 
+      if (!user) {
+        const error = info.name === 'TokenExpiredError' ? 'expired token' : 'invalid token';
+        return res.status(401).json({ error });
+      }
+
+      req.user = user;
+      next();
+    }
+  )(req, res, next);
+}
   // GET skilar stökum notanda ef til
   // Lykilorðs hash skal ekki vera sýnilegt
 router.get('/users',
