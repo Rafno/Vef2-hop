@@ -9,7 +9,7 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'Pluto050196',
+      password: 'MK301554',
     });
     await client.connect();
     let result;
@@ -110,15 +110,14 @@ async function patcBooksById(res, {id,title, author, description, isbn10, isbn13
     }
 }
 async function getBooksById(id, res){
-    console.log("ferðu inn")
+
     let q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books Where id = $1';
     let svar = await query(q,[id]);
-    console.log(svar.rowCount);
+
     if(svar.rowCount > 0){
-        console.log("kemstu inn")
         return svar.rows;
     }
-    console.log("kemstu hingað");
+
     const villa = {
         field: 'ID',
         Error: ' There is no book here with this ID ',
