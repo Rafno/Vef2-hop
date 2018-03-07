@@ -81,6 +81,22 @@ function postBooksError(gogn) {
   return fylki;
 }
 
+function errorHandler(username, password) {
+  const fylki = [];
+  if (password.length < 6) {
+    const error = {
+      error: 'Password must be 6 characters of length minimum',
+    }
+    fylki.push(error);
+  }
+  if (username.length < 3) {
+    error = {
+      error: 'Username must be 3 characters of length minimum',
+    }
+    fylki.push(error);
+  }
+  return fylki;
+}
 const {
   PORT: port = 3000,
   JWT_SECRET: jwtSecret,
@@ -108,22 +124,6 @@ async function strat(data, next) {
 
 passport.use(new Strategy(jwtOptions, strat));
 
-function errorHandler(username, password) {
-  const fylki = [];
-  if (password.length < 6) {
-    const error = {
-      error: 'Password must be 6 characters of length minimum',
-    }
-    fylki.push(error);
-  }
-  if (username.length < 3) {
-    error = {
-      error: 'Username must be 3 characters of length minimum',
-    }
-    fylki.push(error);
-  }
-  return fylki;
-}
 // Allir routerar settir í sömu röð og gefið í dæminu.
 // TODO, þarf að geta tekið inn mynd.
 router.post(
