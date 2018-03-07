@@ -9,7 +9,7 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'MK301554',
+      password: 'Pluto050196',
     });
     await client.connect();
     let result;
@@ -39,7 +39,6 @@ async function postCategories({categories_name} = {}) {
     gogn = await query(q,[categories_name]);
     return gogn.rows;
 }
-// -------------- Föll byrir Books -----------------------//
 async function getBooks() {
     const q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books;';
     const gogn = await query(q,[]);
@@ -124,6 +123,21 @@ async function getBooksById(id, res){
     }
         res.status(400).json({villa})
 }
+async function searchBooks(search = '') {
+    try {
+      let q = `
+        SELECT * FROM books
+        WHERE
+          to_tsvector('english', title) @@ to_tsquery('english', $1)
+          OR
+          to_tsvector('english', description) @@ to_tsquery('english', $1) ORDER BY title LIMIT 10 OFFSET 0
+        `;
+      const res = await query(q, [search]);
+      return res.rows;
+    } catch (e) {
+      console.error('Error selecting', e);
+    }
+  }
 
 module.exports = {
     getCategories,
@@ -132,4 +146,5 @@ module.exports = {
     postBooks,
     getBooksById,
     patcBooksById,
+    searchBooks,
 }

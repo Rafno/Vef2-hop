@@ -11,7 +11,10 @@ router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
 
-
+/*-------------- Object skoðun------------------- */
+function isEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}
 /* -------------- Villumeðhöndlun -----------------------*/
 function postCategoriesError(gogn) {
   if (typeof (gogn) === 'string') {
@@ -228,14 +231,30 @@ router.post(
     }
   }
 );
-
-
 // GET skilar síðu af bókum
 router.get(
   '/books', requireAuthentication,
   async (req, res) => {
-    const data = await book.getBooks();
-    res.status(200).json({ data });
+    console.log('hey');
+    const { search  } = req.query;
+    console.info(typeof(search));
+    if(typeof(search) === 'string'){
+      const leita = await book.searchBooks(search);
+      console.log(Object.keys(leita).length)
+      if(Object.keys(leita).length === 0){
+          const villa = {
+            field:" Error",
+            Error:" Sorry but you're search for '"+ search+ "' returned nothing",
+          }
+          res.status(400).json({ villa });
+      } else {
+        res.status(200).json({leita});
+      }
+    } else {
+      const data = await book.getBooks();
+      res.status(200).json({ data });
+    }
+
   });
 // POST býr til nýja bók ef hún er gild og skilar
 router.post(
@@ -261,15 +280,6 @@ router.post(
       res.status(400).json({ errarray });
     }
   });
-
-// Skoða betur, óviss hvernig ?search=query virkar.
-router.get('/books?search=query', (req, res) => {
-  console.log("kemst inn í leita");
-  // GET skilar síðu af bókum sem uppfylla leitarskilyrði, sjá að neðan
-  const { leit  } = req.params;
-  console.log(leit);
-});
-
 router.get(
   '/books/:id', requireAuthentication,
   async (req, res) => {
@@ -327,5 +337,7 @@ router.post('/users/me/read', requireAuthentication, (req, res) => {
 router.delete('/users/me/read/:id', requireAuthentication, (req, res) => {
   // DELETE eyðir lestri bókar fyrir innskráðann notanda
 });
+
+
 
 module.exports = router;
