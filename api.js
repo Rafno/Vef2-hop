@@ -108,14 +108,34 @@ async function strat(data, next) {
 
 passport.use(new Strategy(jwtOptions, strat));
 
+function errorHandler(username, password) {
+  const fylki = [];
+  if (password.length < 6) {
+    const error = {
+      error: 'Password must be 6 characters of length minimum',
+    }
+    fylki.push(error);
+  }
+  if (username.length < 3) {
+    error = {
+      error: 'Username must be 3 characters of length minimum',
+    }
+    fylki.push(error);
+  }
+  return fylki;
+}
 // Allir routerar settir í sömu röð og gefið í dæminu.
 // TODO, þarf að geta tekið inn mynd.
 router.post(
   '/register',
   async (req, res) => {
+    let error = [];
     const { username, password, name } = req.body;
+    error = errorHandler(username, password);
+    if (error.length > 0) {
+      return res.status(400).json({ error });
+    }
     const user = await users.findByUsername(username);
-
     if (user) {
       return res.status(401).json({ error: 'User already exists' });
     }
@@ -172,31 +192,42 @@ router.get('/users',
 
 // GET skilar stökum notanda ef til
 // Lykilorðs hash skal ekki vera sýnilegt
-router.get('/users/:id',
-  requireAuthentication, async (req, res) => {
-    const { id } = req.params;
-    const data = await users.findById(id);
-    if (!data) {
-      return res.status(401).json({ error: 'User does not exist' });
-    }
-    return res.status(200).json({ data })
-
-  });
-
-router.get('/users/me', requireAuthentication, (req, res) => {
-  // GET skilar innskráðum notanda (þ.e.a.s. þér)
+router.get('/users/me', requireAuthentication, async (req, res) => {
+  const { id, username, name } = await users.findById(req.user.id);
+  return res.status(200).json({ identity: id, username, name });
 });
-router.patch('/users/me', requireAuthentication, (req, res) => {
+router.patch('/users/me', requireAuthentication, async (req, res) => {
   // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn, þ.e.a.s. nafn eða lykilorð, ef þau eru gild
+  let error = [];
+  const { username, password, name } = req.body;
+  error = errorHandler(username, password);
+  if (error.length > 0) {
+    return res.status(400).json({ error });
+  }
+  await users.editUser(req.user.id, username, password, name);
+  return res.status(200).json({Success:'Your account has been modified', username, password, name});
 });
 
 router.post('/users/me/profile', (req, res) => {
-  console.log("halló");
   const slod = req.body.key;
   console.log(req.body);
   const a = req.body;
   console.log(a);
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
+});
+router.get('/users/:id/read', requireAuthentication, async (req, res) => {
+  // GET skilar síðu af lesnum bókum notanda
+});
+
+router.get('/users/me/read', requireAuthentication, async (req, res) => {
+  // GET skilar síðu af lesnum bókum innskráðs notanda
+});
+/* Rafnar geriri*/
+router.post('/users/me/read', requireAuthentication, async (req, res) => {
+  // POST býr til nýjan lestur á bók og skilar
+});
+router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
+  // DELETE eyðir lestri bókar fyrir innskráðann notanda
 });
 
 // GET skilar síðu af flokkum
@@ -270,6 +301,16 @@ router.get('/books?search=query', (req, res) => {
   console.log(leit);
 });
 
+router.get('/users/:id',
+  requireAuthentication, async (req, res) => {
+    const { id } = req.params;
+    const data = await users.findById(id);
+    if (!data) {
+      return res.status(401).json({ error: 'User does not exist' });
+    }
+    return res.status(200).json({ data })
+
+  });
 router.get(
   '/books/:id', requireAuthentication,
   async (req, res) => {
@@ -295,7 +336,7 @@ router.patch(
     let errarray = [];
     errarray = postBooksError(data);
     if (errarray.length === 0) {
-      const gogn = await book.patcBooksById(res, {
+      const gogn = await book.patchBooksById(res, {
         id: id,
         title: data.title,
         author: data.author,
@@ -313,19 +354,6 @@ router.patch(
     }
   }
 );
-router.get('/users/:id/read', requireAuthentication, (req, res) => {
-  // GET skilar síðu af lesnum bókum notanda
-});
 
-router.get('/users/me/read', requireAuthentication, (req, res) => {
-  // GET skilar síðu af lesnum bókum innskráðs notanda
-});
-/* Rafnar geriri*/
-router.post('/users/me/read', requireAuthentication, (req, res) => {
-  // POST býr til nýjan lestur á bók og skilar
-});
-router.delete('/users/me/read/:id', requireAuthentication, (req, res) => {
-  // DELETE eyðir lestri bókar fyrir innskráðann notanda
-});
 
 module.exports = router;
