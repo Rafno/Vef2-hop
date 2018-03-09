@@ -61,7 +61,7 @@ async function findAll() {
   return null;
 }
 async function findById(id) {
-  const q = 'SELECT id, username,password,name FROM users WHERE id = $1';
+  const q = 'SELECT id, username,name FROM users WHERE id = $1';
 
   const result = await query(q, [id]);
 
@@ -110,7 +110,14 @@ async function deleteReadBook(id) {
   const result = await query(q, [id, title, grade, judge]);
   return result.rows[0];
 }
-
+async function findBookByTitle(title) {
+  const q = 'SELECT title from books WHERE title = $1';
+  const result = await query(q, [title]);
+  if (result.rowCount === 0) {
+    return null;
+  }
+  return true;
+}
 module.exports = {
   comparePasswords,
   findByUsername,
@@ -121,4 +128,5 @@ module.exports = {
   readBooks,
   addReadBook,
   deleteReadBook,
+  findBookByTitle,
 }
