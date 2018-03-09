@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const users = require('./users');
@@ -232,9 +233,6 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
 
 router.post('/users/me/profile', (req, res) => {
   const slod = req.body.key;
-  console.log(req.body);
-  const a = req.body;
-  console.log(a);
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
 
@@ -294,17 +292,14 @@ router.post(
 router.get(
   '/books', requireAuthentication,
   async (req, res) => {
-    console.log('hey');
     const { search } = req.query;
     let { offset = 0, limit = 10  } = req.query;
     offset = Number(offset);
     limit = Number(limit);
-    console.log("hallo")
     console.info(typeof(search));
     let leita = {};
     if(typeof(search) === 'string'){
       leita = await book.searchBooks(search, limit, offset);
-      console.log(Object.keys(leita).length);
     } else {
       const data = await book.getBooks(limit, offset);
       const response = limiter(data, limit, offset);
