@@ -12,7 +12,7 @@ async function create(){
         });
     await client.connect();
     for(let i = 0; books.length; i++) {
-    const data = await clie+nt.query(
+    const data = await client.query(
         `INSERT INTO books(title,author,description,isbn10,isbn13,published,pagecount,language,category)
         Values($1$2$23)`,[
             books[i].title,

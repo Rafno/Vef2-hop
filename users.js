@@ -17,7 +17,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'Pluto050196',
+    password: 'MK301554',
   });
   await client.connect();
 
@@ -68,7 +68,6 @@ async function findById(id) {
   if (result.rowCount === 1) {
     return result.rows[0];
   }
-
   return null;
 }
 
@@ -92,27 +91,31 @@ async function editUser(id, username, password, name) {
 }
 
 async function readBooks(id) {
-  if (!findById(id)) {
+  if (!(findById(id))) {
     return null;
   }
   const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1;';
   const result = await query(q, [id]);
-<<<<<<< HEAD
-  console.log(result.rows[1]);
-=======
->>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
+  if (result.rowCount === 0) {
+    return null;
+  }
   return result.rows;
 }
 
-async function addReadBook(id, title, grade, judge) {
+async function addReadBook(book_id, title, grade, judge) {
   const q = 'INSERT INTO booksread(booksread_id, booksread_title, booksread_grade, booksread_judge) VALUES($1,$2,$3,$4) RETURNING * ';
-  const result = await query(q, [id, title, grade, judge]);
+  const result = await query(q, [book_id, title, grade, judge]);
   return result.rows[0];
 }
-async function deleteReadBook(id) {
-  const q = 'DELETE from booksread WHERE booksread_id = $1';
-  const result = await query(q, [id, title, grade, judge]);
-  return result.rows[0];
+async function deleteReadBook(book_id) {
+  let q = 'SELECT id FROM booksread WHERE id = $1';
+  let result = await query(q, [book_id]);
+  if (result.rowCount === 0) {
+    return null;
+  }
+  q = 'DELETE from booksread WHERE id = $1';
+  result = await query(q, [book_id]);
+  return result.rows;
 }
 async function findBookByTitle(title) {
   const q = 'SELECT title from books WHERE title = $1';

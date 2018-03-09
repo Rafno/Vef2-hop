@@ -256,16 +256,22 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
   return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const books = await users.deleteReadBook(id);
-  return res.status(200).json({ books_Deleted: books });
+  if (!books) {
+    return res.status(404).json({ Error: 'Book does not exist' });
+  }
+    return res.status(200).json({ Success: 'Book deleted' });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
-  const users_books = await users.readBooks(req.params.id);
-  if (users_books === null) {
-    return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
+  const user = await users.findById(req.params.id);
+  if (user) {
+    const userID = await users.readBooks(user.id);
+    if (userID) {
+      return res.status(200).json({ userID });
+    }
   }
-  return res.status(200).json({ users_books });
+  return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
   const user = await users.findById(req.params.id);
@@ -277,7 +283,7 @@ router.get('/users/:id', requireAuthentication, async (req, res) => {
 
 // GET skilar síðu af flokkum
 router.get(
-<<<<<<< HEAD
+
   '/categories', requireAuthentication,
   async (req, res) => {
     let { offset = 0, limit = 10  } = req.query;
@@ -289,11 +295,6 @@ router.get(
     const data = await book.getCategories(limit, offset);
     const response = limiter(data, limit, offset, 'categories');
     res.status(200).json({ response });
-=======
-  '/categories', async (req, res) => {
-    const data = await book.getCategories();
-    res.status(200).json({ data });
->>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
   });
 
 // POST býr til nýjan flokk
@@ -312,7 +313,7 @@ router.post(
       }
     } else {
       res.status(400).json({
-        categories_name: " Sorry the name of the categories must be a string"
+        categories_name: ' Sorry the name of the categories must be a string'
       });
     }
   }
@@ -337,7 +338,7 @@ router.get(
     }
     if(Object.keys(leita).length === 0){
         const villa = {
-          field:" Error",
+          field:' Error',
           Error:" Sorry but your search for '"+ search+ "' returned nothing",
         }
         res.status(400).json({ villa });
@@ -348,7 +349,7 @@ router.get(
 
   });
 /**
- * TODO; explain what this function does!
+ * This function accepts the param and checks if it is of the correct format of a book.
  * @param {any} data
  */
 function testBookTemplate(data) {
@@ -447,8 +448,5 @@ router.patch(
     }
   }
 );
-
-
-
 
 module.exports = router;
