@@ -249,9 +249,14 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
 
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
+  const { id, title, grade, judge } = req.body;
+  const books = await users.addReadBook(id, title, grade, judge);
+  return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
-  // DELETE eyðir lestri bókar fyrir innskráðann notanda
+  const { id } = req.body;
+  const books = await users.deleteReadBook(id);
+  return res.status(200).json({ books });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   const users_books = await users.readBooks(req.params.id);
