@@ -10,7 +10,27 @@ const book = require('./book');
 router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
-
+function limiter ( data, limit, offset){
+  const result = {
+    _links: {
+      self: {
+        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}`
+      }
+    },
+    items: data
+  };
+  if (offset > 0) {
+    result._links['prev'] = {
+      href: `http://localhost:${port}/books?offset=${offset-limit}&limit=${limit}`
+    }
+  }
+  if (data.length >= limit) {
+    result._links['next'] = {
+      href: `http://localhost:${port}/books?offset=${Number(offset)+limit}&limit=${limit}`
+    }
+  }
+  return result;
+}
 /*-------------- Object skoðun------------------- */
 function isEmpty(obj) {
   return Object.keys(obj).length === 0;
@@ -22,7 +42,6 @@ function postCategoriesError(gogn) {
   }
   return false;
 }
-
 function postBooksError(gogn) {
   const fylki = [];
   if (gogn.title.length === 0) {
@@ -267,23 +286,31 @@ router.get(
   '/books', requireAuthentication,
   async (req, res) => {
     console.log('hey');
-    const { search  } = req.query;
+    const { search } = req.query;
+    let { offset = 0, limit = 10  } = req.query;
+    offset = Number(offset);
+    limit = Number(limit);
+    console.log("hallo")
     console.info(typeof(search));
+    let leita = {};
     if(typeof(search) === 'string'){
-      const leita = await book.searchBooks(search);
-      console.log(Object.keys(leita).length)
-      if(Object.keys(leita).length === 0){
-          const villa = {
-            field:" Error",
-            Error:" Sorry but you're search for '"+ search+ "' returned nothing",
-          }
-          res.status(400).json({ villa });
-      } else {
-        res.status(200).json({leita});
-      }
+      leita = await book.searchBooks(search, limit, offset);
+      console.log(Object.keys(leita).length);
     } else {
-      const data = await book.getBooks();
-      res.status(200).json({ data });
+      const data = await book.getBooks(limit, offset);
+      const response = limiter(data, limit, offset);
+      res.status(200).json(response);
+      return;
+    }
+    if(Object.keys(leita).length === 0){
+        const villa = {
+          field:" Error",
+          Error:" Sorry but you're search for '"+ search+ "' returned nothing",
+        }
+        res.status(400).json({ villa });
+    } else {
+      const response = limiter(leita, limit, offset);
+      res.status(200).json({response});
     }
 
   });
@@ -311,28 +338,6 @@ router.post(
       res.status(400).json({ errarray });
     }
   });
-<<<<<<< HEAD
-=======
-
-// Skoða betur, óviss hvernig ?search=query virkar.
-router.get('/books?search=query', (req, res) => {
-  console.log("kemst inn í leita");
-  // GET skilar síðu af bókum sem uppfylla leitarskilyrði, sjá að neðan
-  const { leit  } = req.params;
-  console.log(leit);
-});
-
-router.get('/users/:id',
-  requireAuthentication, async (req, res) => {
-    const { id } = req.params;
-    const data = await users.findById(id);
-    if (!data) {
-      return res.status(401).json({ error: 'User does not exist' });
-    }
-    return res.status(200).json({ data })
-
-  });
->>>>>>> 02b342c41f0ec054c81503cc6b87787822f264bf
 router.get(
   '/books/:id', requireAuthentication,
   async (req, res) => {
