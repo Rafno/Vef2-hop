@@ -51,10 +51,10 @@ async function findByUsername(username) {
 
   return null;
 }
-async function findAll() {
-  const q = 'SELECT username, name FROM users';
+async function findAll(limit, offset) {
+  const q = 'SELECT username, name FROM users ORDER BY name limit $1 offset $2';
 
-  const result = await query(q, []);
+  const result = await query(q, [limit, offset]);
   if (result.rowCount > 0) {
     return result.rows;
   }
@@ -91,12 +91,12 @@ async function editUser(id, username, password, name) {
   return result.rows[0];
 }
 
-async function readBooks(id) {
+async function readBooks(id, limit, offset) {
   if (!findById(id)) {
     return null;
   }
-  const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1;';
-  const result = await query(q, [id]);
+  const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1 ORDER BY booksread_title limit $2 offset $3;';
+  const result = await query(q, [id, limit, offset]);
   return result.rows;
 }
 

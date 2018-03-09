@@ -213,7 +213,7 @@ router.get('/users',
     let { offset = 0, limit = 10  } = req.query;
     offset = Number(offset);
     limit = Number(limit);
-    const data = await users.findAll();
+    const data = await users.findAll(limit, offset);
     const response = limiter(data, limit, offset,'users');
     return res.status(200).json({ response });
   });
@@ -243,11 +243,15 @@ router.post('/users/me/profile', (req, res) => {
 
 router.get('/users/me/read', requireAuthentication, async (req, res) => {
   // GET skilar síðu af lesnum bókum innskráðs notanda
-  const my_books = await users.readBooks(req.user.id);
+  let { offset = 0, limit = 10  } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+  const my_books = await users.readBooks(req.user.id,limit,offset);
   if (my_books === null) {
     return res.status(401).json({ Empty: 'You have not read any books' });
   }
-  return res.status(200).json({ my_books });
+  const response = limiter(my_books, limit, offset, '/users/me/read');
+  return res.status(200).json({ response });
 });
 
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
