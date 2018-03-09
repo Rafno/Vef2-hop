@@ -97,7 +97,7 @@ async function readBooks(id) {
   }
   const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1;';
   const result = await query(q, [id]);
-  return result.rows[0];
+  return result.rows;
 }
 
 async function addReadBook(id, title, grade, judge) {
