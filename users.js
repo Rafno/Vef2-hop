@@ -120,4 +120,5 @@ module.exports = {
   editUser,
   readBooks,
   addReadBook,
+  deleteReadBook,
 }

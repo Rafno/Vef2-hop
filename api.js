@@ -256,7 +256,7 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   const { id } = req.body;
   const books = await users.deleteReadBook(id);
-  return res.status(200).json({ books });
+  return res.status(200).json({ books_Deleted: books });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   const users_books = await users.readBooks(req.params.id);
