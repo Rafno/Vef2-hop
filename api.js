@@ -350,6 +350,10 @@ router.get(
     }
 
   });
+/**
+ * TODO; explain what this function does!
+ * @param {any} data
+ */
 function testBookTemplate(data) {
   const fylki = [];
   if (!(data.hasOwnProperty('title'))){
