@@ -11,23 +11,23 @@ const book = require('./book');
 router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
-function limiter ( data, limit, offset){
+function limiter ( data, limit, offset,type){
   const result = {
     _links: {
       self: {
-        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}`
+        href: `http://localhost:${port}/${type}?offset=${offset}&limit=${limit}`
       }
     },
     items: data
   };
   if (offset > 0) {
     result._links['prev'] = {
-      href: `http://localhost:${port}/books?offset=${offset-limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${offset-limit}&limit=${limit}`
     }
   }
   if (data.length >= limit) {
     result._links['next'] = {
-      href: `http://localhost:${port}/books?offset=${Number(offset)+limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${Number(offset)+limit}&limit=${limit}`
     }
   }
   return result;
@@ -277,9 +277,23 @@ router.get('/users/:id', requireAuthentication, async (req, res) => {
 
 // GET skilar síðu af flokkum
 router.get(
+<<<<<<< HEAD
+  '/categories', requireAuthentication,
+  async (req, res) => {
+    let { offset = 0, limit = 10  } = req.query;
+    offset = Number(offset);
+    limit = Number(limit);
+    console.log(typeof(limit));
+    console.log(typeof(offset))
+    console.log("hallo");
+    const data = await book.getCategories(limit, offset);
+    const response = limiter(data, limit, offset, 'categories');
+    res.status(200).json({ response });
+=======
   '/categories', async (req, res) => {
     const data = await book.getCategories();
     res.status(200).json({ data });
+>>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
   });
 
 // POST býr til nýjan flokk
@@ -317,7 +331,7 @@ router.get(
       leita = await book.searchBooks(search, limit, offset);
     } else {
       const data = await book.getBooks(limit, offset);
-      const response = limiter(data, limit, offset);
+      const response = limiter(data, limit, offset, 'books');
       res.status(200).json(response);
       return;
     }

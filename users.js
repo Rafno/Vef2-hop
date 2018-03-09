@@ -17,7 +17,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'MK301554',
+    password: 'Pluto050196',
   });
   await client.connect();
 
@@ -97,6 +97,10 @@ async function readBooks(id) {
   }
   const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1;';
   const result = await query(q, [id]);
+<<<<<<< HEAD
+  console.log(result.rows[1]);
+=======
+>>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
   return result.rows;
 }
 

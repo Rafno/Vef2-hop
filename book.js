@@ -9,7 +9,7 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'MK301554',
+      password: 'Pluto050196',
     });
     await client.connect();
     let result;
@@ -23,16 +23,9 @@ async function query(q, values = []) {
     return result;
   }
   // -------------- Föll fyrir Categories ------------------ //
-async function getCategories() {
-    const client = new Client({
-        user: 'postgres',
-        host: 'localhost',
-        database: 'library',
-        password: 'MK301554',
-      });
-    await client.connect();
-    const gogn = await client.query('SELECT id,categories_name FROM categories;');
-    await client.end;
+async function getCategories(LIMIT, OFFSET) {
+    const q = 'SELECT id,categories_name FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
+    const gogn = await query(q,[LIMIT, OFFSET]);
     return gogn.rows;
 }
 
@@ -41,7 +34,7 @@ async function postCategories({categories_name} = {}) {
         user: 'postgres',
         host: 'localhost',
         database: 'library',
-        password: 'MK301554',
+        password: 'Pluto050196',
       });
     await client.connect();
     let gogn = await client.query('SELECT categories_name FROM categories where categories_name = $1',[
