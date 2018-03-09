@@ -9,7 +9,7 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'MK301554',
+      password: 'Pluto050196',
     });
     await client.connect();
     let result;
@@ -24,25 +24,41 @@ async function query(q, values = []) {
   }
   // -------------- Föll fyrir Categories ------------------ //
 async function getCategories() {
-    const q = 'SELECT id,categories_name FROM categories;';
-    const gogn = await query(q,[]);
+    const client = new Client({
+        user: 'postgres',
+        host: 'localhost',
+        database: 'library',
+        password: 'Pluto050196',
+      });
+    await client.connect();
+    const gogn = await client.query('SELECT id,categories_name FROM categories;');
+    await client.end;
     return gogn.rows;
 }
 
 async function postCategories({categories_name} = {}) {
-    let q = 'SELECT categories_name FROM categories where categories_name = $1';
-    let gogn = await query(q,[categories_name]);
+    const client = new Client({
+        user: 'postgres',
+        host: 'localhost',
+        database: 'library',
+        password: 'Pluto050196',
+      });
+    await client.connect();
+    let gogn = await client.query('SELECT categories_name FROM categories where categories_name = $1',[
+        xss(categories_name)
+    ]);
     if (gogn.rowCount === 1){
         return null;
     }
-    q = 'INSERT INTO categories (categories_name) VALUES($1);'
-    gogn = await query(q,[categories_name]);
+    gogn = await client.query('INSERT INTO categories (categories_name) VALUES($1);',[
+        xss(categories_name)
+    ])
+    await client.end();
     return gogn.rows;
 }
-// -------------- Föll byrir Books -----------------------//
-async function getBooks() {
-    const q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books;';
-    const gogn = await query(q,[]);
+async function getBooks(LIMIT, OFFSET) {
+    const q = 'SELECT id, title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books ORDER BY title LIMIT $1 OFFSET $2 ';
+    const gogn = await query(q,[LIMIT, OFFSET]);
     return gogn.rows;
 }
 async function postBooks(res,{title, author, description, isbn10, isbn13, published, pagecount, language, category}={}){
@@ -124,6 +140,21 @@ async function getBooksById(id, res){
     }
         res.status(400).json({villa})
 }
+async function searchBooks(search = '',LIMIT,OFFSET) {
+    try {
+      let q = `
+        SELECT id, title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books
+        WHERE
+          to_tsvector('english', title) @@ to_tsquery('english', $1)
+          OR
+          to_tsvector('english', description) @@ to_tsquery('english', $1) ORDER BY title LIMIT $2 OFFSET $3
+        `;
+      const res = await query(q, [search, LIMIT, OFFSET]);
+      return res.rows;
+    } catch (e) {
+      console.error('Error selecting', e);
+    }
+  }
 
 module.exports = {
     getCategories,
@@ -132,4 +163,5 @@ module.exports = {
     postBooks,
     getBooksById,
     patchBooksById,
+    searchBooks,
 }
