@@ -215,19 +215,28 @@ router.post('/users/me/profile', (req, res) => {
   console.log(a);
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
-router.get('/users/:id/read', requireAuthentication, async (req, res) => {
-  // GET skilar síðu af lesnum bókum notanda
-});
 
 router.get('/users/me/read', requireAuthentication, async (req, res) => {
   // GET skilar síðu af lesnum bókum innskráðs notanda
+  const my_books = await users.readBooks(req.user.id);
+  if (my_books === null) {
+    return res.status(401).json({ Empty: 'You have not read any books' });
+  }
+  return res.status(200).json({ my_books });
 });
-/* Rafnar geriri*/
+
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
-  // POST býr til nýjan lestur á bók og skilar
+  // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   // DELETE eyðir lestri bókar fyrir innskráðann notanda
+});
+router.get('/users/:id/read', requireAuthentication, async (req, res) => {
+  const users_books = await users.readBooks(req.params.id);
+  if (users_books === null) {
+    return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
+  }
+  return res.status(200).json({ users_books });
 });
 
 // GET skilar síðu af flokkum

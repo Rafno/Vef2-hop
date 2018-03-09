@@ -91,6 +91,18 @@ async function editUser(id, username, password, name) {
   return result.rows[0];
 }
 
+async function readBooks(id) {
+  if (!findById(id)) {
+    return null;
+  }
+  const q = 'SELECT * from booksread where booksread_id = $1;';
+  const result = await query(q, [id]);
+  return result.rows[0];
+}
+async function addReadBook() {
+
+}
+
 module.exports = {
   comparePasswords,
   findByUsername,
@@ -98,4 +110,5 @@ module.exports = {
   findAll,
   createUser,
   editUser,
+  readBooks,
 }

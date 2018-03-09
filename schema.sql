@@ -5,13 +5,13 @@
 * copy books (title, author, description, isbn10, isbn13, published, pagecount, language, category) FROM 'C:\\Users\\Sixsmith\\Desktop\\Vef2-hop\\data\\books.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' ESCAPE '''';
 * GOD HELP YOU IF YOU LOSE THESE COMMANDS.
 */
-/* ++++++++++ Fyrsta taflan users l��sing ++++++++++
+/* ++++++++++ Fyrsta taflan users lï¿½ï¿½sing ++++++++++
  * Notendur
- * Au�kenni, primary key
+ * Auï¿½kenni, primary key
  * Notendanafn, einstakt gildi, a.m.k. 3 stafir, krafist
- * Lykilor�s hash, lykilor� ver�ur a� vera a.m.k. 6 stafir, krafist
- * Nafn, ekki t�mi strengurinn, krafist
- *Sl�� � mynd, ekki krafist
+ * Lykilorï¿½s hash, lykilorï¿½ verï¿½ur aï¿½ vera a.m.k. 6 stafir, krafist
+ * Nafn, ekki tï¿½mi strengurinn, krafist
+ *Slï¿½ï¿½ ï¿½ mynd, ekki krafist
 */
 create table users(
  id serial primary key,
@@ -24,10 +24,10 @@ create table users(
 );
 
 
-/* ++++++++++ 2 taflan l��sing ++++++++++
+/* ++++++++++ 2 taflan lï¿½ï¿½sing ++++++++++
  * Flokkar
- * Au�kenni, primary key
- * Heiti, einstakt gildi, ekki t�mi strengurinn, krafist
+ * Auï¿½kenni, primary key
+ * Heiti, einstakt gildi, ekki tï¿½mi strengurinn, krafist
 */
 create table categories(
 id serial primary key,
@@ -35,7 +35,7 @@ categories_name varchar(99) NOT NULL CHECK (categories_name <> ''),
 UNIQUE(categories_name)
 );
 /*
- * Inser skipanir fyrir t�fluna categories
+ * Inser skipanir fyrir töfluna categories
 */
 insert into categories(categories_name) Values('Fiction');
 insert into categories(categories_name) Values('Nonfiction');
@@ -51,18 +51,18 @@ insert into categories(categories_name) Values('Business');
 insert into categories(categories_name) Values('Computer Science');
 
 
-/* ++++++++++ 3 tafla l��sing ++++++++++
- * B�kur
- * Au�kenni, primary key
- * Titill, einstakt gildi, ekki t�mi strengurinn, krafist
- * ISBN13, einstakt gildi, n�kv�mlega 13 stafa strengur ger�ur �r t�lum, krafist
- * H�fundur, ekki krafist
- * L�sing, lengri texti, ekki krafist
- * Flokkur, foreign key � flokka t�flu, krafist
- * ISBN10, strengur, ekki krafist, ekki krafa a� hafa me� � verkefni
- * �tg�fudagsetning, ekki krafist, strengur, ekki krafa a� hafa me� � verkefni
- * S��ufj�ldi, tala, st�rri en 0, ekki krafist, ekki krafa a� hafa me� � verkefni
- * Tungum�l, 2 stafa strengur, ekki krafist, ekki krafa a� hafa me� � verkefni
+/* ++++++++++ 3 tafla lï¿½ï¿½sing ++++++++++
+ * Bï¿½kur
+ * Auï¿½kenni, primary key
+ * Titill, einstakt gildi, ekki tï¿½mi strengurinn, krafist
+ * ISBN13, einstakt gildi, nï¿½kvï¿½mlega 13 stafa strengur gerï¿½ur ï¿½r tï¿½lum, krafist
+ * Hï¿½fundur, ekki krafist
+ * Lï¿½sing, lengri texti, ekki krafist
+ * Flokkur, foreign key ï¿½ flokka tï¿½flu, krafist
+ * ISBN10, strengur, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
+ * ï¿½tgï¿½fudagsetning, ekki krafist, strengur, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
+ * Sï¿½ï¿½ufjï¿½ldi, tala, stï¿½rri en 0, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
+ * Tungumï¿½l, 2 stafa strengur, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
 */
 create table books(
 id serial primary key,
@@ -80,21 +80,21 @@ UNIQUE(isbn13),
 FOREIGN KEY(category) REFERENCES categories(categories_name)
 );
 
-/* ++++++++++ 4 tafla l��sing  ++++++++++
- * Lesnar b�kur notenda
- * Au�kenni
- * Au�kenni notanda, foreign key � notanda t�flu, krafist
- * Au�kenni b�kar, foreign key � b�ka t�flu, krafist
- * Einkunn notanda, gildi �r eftirfarandi lista 1, 2, 3, 4, 5 �ar sem 1 er l�gsta einkunn og 5 h�sta, krafist
- * D�mur notanda, lengri texti, ekki krafist
+/* ++++++++++ 4 tafla lï¿½ï¿½sing  ++++++++++
+ * Lesnar bï¿½kur notenda
+ * Auï¿½kenni
+ * Auï¿½kenni notanda, foreign key ï¿½ notanda tï¿½flu, krafist
+ * Auï¿½kenni bï¿½kar, foreign key ï¿½ bï¿½ka tï¿½flu, krafist
+ * Einkunn notanda, gildi ï¿½r eftirfarandi lista 1, 2, 3, 4, 5 ï¿½ar sem 1 er lï¿½gsta einkunn og 5 hï¿½sta, krafist
+ * Dï¿½mur notanda, lengri texti, ekki krafist
 */
 create table booksread(
 id serial,
-booksread_user varchar(99) NOT NULL,
+booksread_id integer NOT NULL,
 booksread_title varchar(99) NOT NULL,
 booksread_grade INT CHECK (booksread_grade >0 AND booksread_grade < 6) NOT NULL,
 booksread_judge TEXT,
-FOREIGN KEY (booksread_user) REFERENCES users (username),
+FOREIGN KEY (booksread_id) REFERENCES users (id),
 FOREIGN KEy (booksread_title) REFERENCES books (title)
 );
 
