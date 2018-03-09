@@ -12,6 +12,7 @@ router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
 function limiter ( data, limit, offset,type){
+  console.log(data);
   const result = {
     _links: {
       self: {
@@ -209,8 +210,12 @@ function requireAuthentication(req, res, next) {
 // Lykilorðs hash skal ekki vera sýnilegt
 router.get('/users',
   requireAuthentication, async (req, res) => {
-    const results = await users.findAll();
-    return res.status(200).json({ results });
+    let { offset = 0, limit = 10  } = req.query;
+    offset = Number(offset);
+    limit = Number(limit);
+    const data = await users.findAll();
+    const response = limiter(data, limit, offset,'users');
+    return res.status(200).json({ response });
   });
 
 // GET skilar stökum notanda ef til
@@ -247,12 +252,12 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
 
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
-  const { title, grade, judge } = req.body;
-  const bookTitle = await users.findBookByTitle(title);
+  const { booksread_title, booksread_grade, booksread_judge } = req.body;
+  const bookTitle = await users.findBookByTitle(booksread_title);
   if (!(bookTitle)) {
     return res.status(400).json({ Error: 'book does not exist' });
   }
-  const books = await users.addReadBook(req.user.id, title, grade, judge);
+  const books = await users.addReadBook(req.user.id, booksread_title, booksread_grade, booksread_judge);
   return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
@@ -261,10 +266,14 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   return res.status(200).json({ books_Deleted: books });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
+  let { offset = 0, limit = 10  } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
   const users_books = await users.readBooks(req.params.id);
   if (users_books === null) {
     return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
   }
+  const response = limiter(users_books, limit, offset, 'users/:id/read');
   return res.status(200).json({ users_books });
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
@@ -277,7 +286,6 @@ router.get('/users/:id', requireAuthentication, async (req, res) => {
 
 // GET skilar síðu af flokkum
 router.get(
-<<<<<<< HEAD
   '/categories', requireAuthentication,
   async (req, res) => {
     let { offset = 0, limit = 10  } = req.query;
@@ -289,11 +297,6 @@ router.get(
     const data = await book.getCategories(limit, offset);
     const response = limiter(data, limit, offset, 'categories');
     res.status(200).json({ response });
-=======
-  '/categories', async (req, res) => {
-    const data = await book.getCategories();
-    res.status(200).json({ data });
->>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
   });
 
 // POST býr til nýjan flokk
