@@ -11,23 +11,23 @@ const book = require('./book');
 router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
-function limiter ( data, limit, offset){
+function limiter ( data, limit, offset,type){
   const result = {
     _links: {
       self: {
-        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}`
+        href: `http://localhost:${port}/${type}?offset=${offset}&limit=${limit}`
       }
     },
     items: data
   };
   if (offset > 0) {
     result._links['prev'] = {
-      href: `http://localhost:${port}/books?offset=${offset-limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${offset-limit}&limit=${limit}`
     }
   }
   if (data.length >= limit) {
     result._links['next'] = {
-      href: `http://localhost:${port}/books?offset=${Number(offset)+limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${Number(offset)+limit}&limit=${limit}`
     }
   }
   return result;
@@ -268,8 +268,15 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
 router.get(
   '/categories', requireAuthentication,
   async (req, res) => {
-    const data = await book.getCategories();
-    res.status(200).json({ data });
+    let { offset = 0, limit = 10  } = req.query;
+    offset = Number(offset);
+    limit = Number(limit);
+    console.log(typeof(limit));
+    console.log(typeof(offset))
+    console.log("hallo");
+    const data = await book.getCategories(limit, offset);
+    const response = limiter(data, limit, offset, 'categories');
+    res.status(200).json({ response });
   });
 
 // POST býr til nýjan flokk
@@ -307,7 +314,7 @@ router.get(
       leita = await book.searchBooks(search, limit, offset);
     } else {
       const data = await book.getBooks(limit, offset);
-      const response = limiter(data, limit, offset);
+      const response = limiter(data, limit, offset, 'books');
       res.status(200).json(response);
       return;
     }
