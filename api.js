@@ -11,7 +11,7 @@ const book = require('./book');
 router.use(express.json());
 
 // Föll sem er hægt að kalla á í users.js
-function limiter ( data, limit, offset,type){
+function limiter(data, limit, offset, type) {
   const result = {
     _links: {
       self: {
@@ -22,12 +22,12 @@ function limiter ( data, limit, offset,type){
   };
   if (offset > 0) {
     result._links['prev'] = {
-      href: `http://localhost:${port}/${type}?offset=${offset-limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${offset - limit}&limit=${limit}`
     }
   }
   if (data.length >= limit) {
     result._links['next'] = {
-      href: `http://localhost:${port}/${type}?offset=${Number(offset)+limit}&limit=${limit}`
+      href: `http://localhost:${port}/${type}?offset=${Number(offset) + limit}&limit=${limit}`
     }
   }
   return result;
@@ -209,11 +209,11 @@ function requireAuthentication(req, res, next) {
 // Lykilorðs hash skal ekki vera sýnilegt
 router.get('/users',
   requireAuthentication, async (req, res) => {
-    let { offset = 0, limit = 10  } = req.query;
+    let { offset = 0, limit = 10 } = req.query;
     offset = Number(offset);
     limit = Number(limit);
     const data = await users.findAll(limit, offset);
-    const response = limiter(data, limit, offset,'users');
+    const response = limiter(data, limit, offset, 'users');
     return res.status(200).json({ response });
   });
 
@@ -227,12 +227,13 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
   // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn, þ.e.a.s. nafn eða lykilorð, ef þau eru gild
   let error = [];
   const { username, password, name } = req.body;
+
   error = errorHandler(username, password);
   if (error.length > 0) {
     return res.status(400).json({ error });
   }
   await users.editUser(req.user.id, username, password, name);
-  return res.status(200).json({Success:'Your account has been modified', username, password, name});
+  return res.status(200).json({ Success: 'Your account has been modified', username, password, name });
 });
 
 router.post('/users/me/profile', (req, res) => {
@@ -242,10 +243,10 @@ router.post('/users/me/profile', (req, res) => {
 
 router.get('/users/me/read', requireAuthentication, async (req, res) => {
   // GET skilar síðu af lesnum bókum innskráðs notanda
-  let { offset = 0, limit = 10  } = req.query;
+  let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
   limit = Number(limit);
-  const my_books = await users.readBooks(req.user.id,limit,offset);
+  const my_books = await users.readBooks(req.user.id, limit, offset);
   if (my_books === null) {
     return res.status(401).json({ Empty: 'You have not read any books' });
   }
@@ -269,7 +270,7 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   if (!books) {
     return res.status(404).json({ Error: 'Book does not exist' });
   }
-    return res.status(200).json({ Success: 'Book deleted' });
+  return res.status(200).json({ Success: 'Book deleted' });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   let { offset = 0, limit = 10  } = req.query;
@@ -285,6 +286,17 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
     }
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
+  // TODO HELGI
+  let { offset = 0, limit = 10 } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+  const users_books = await users.readBooks(req.params.id);
+  if (users_books === null) {
+    return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
+  }
+  const response = limiter(users_books, limit, offset, 'users/:id/read');
+  return res.status(200).json({ users_books });
+
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
   const user = await users.findById(req.params.id);
@@ -299,7 +311,7 @@ router.get(
 
   '/categories', requireAuthentication,
   async (req, res) => {
-    let { offset = 0, limit = 10  } = req.query;
+    let { offset = 0, limit = 10 } = req.query;
     offset = Number(offset);
     limit = Number(limit);
     const data = await book.getCategories(limit, offset);
@@ -333,11 +345,11 @@ router.get(
   '/books',
   async (req, res) => {
     const { search } = req.query;
-    let { offset = 0, limit = 10  } = req.query;
+    let { offset = 0, limit = 10 } = req.query;
     offset = Number(offset);
     limit = Number(limit);
     let leita = {};
-    if(typeof(search) === 'string'){
+    if (typeof (search) === 'string') {
       leita = await book.searchBooks(search, limit, offset);
     } else {
       const data = await book.getBooks(limit, offset);
@@ -345,41 +357,77 @@ router.get(
       res.status(200).json(response);
       return;
     }
-    if(Object.keys(leita).length === 0){
-        const villa = {
-          field:' Error',
-          Error:" Sorry but your search for '"+ search+ "' returned nothing",
-        }
-        res.status(400).json({ villa });
+    if (Object.keys(leita).length === 0) {
+      const villa = {
+        field: ' Error',
+        Error: " Sorry but your search for '" + search + "' returned nothing",
+      }
+      res.status(400).json({ villa });
     } else {
       const response = limiter(leita, limit, offset);
-      res.status(200).json({response});
+      res.status(200).json({ response });
     }
 
   });
+/** TODO, setja á þau föll sem eiga við.
+ * This function tests if the Param for any user is correct.
+ * @param {any} data
+ */
+function testUserTemplate(data) {
+  const fylki = [];
+  if (!(data.hasOwnProperty('username'))) {
+    fylki.push({
+      Error: 'Incorrect format'
+    });
+  } else if (!(data.hasOwnProperty('password'))) {
+    fylki.push({
+      Error: "Incorrect format"
+    });
+  } else if (!(data.hasOwnProperty('name'))) {
+    fylki.push({
+      Error: "Incorrect format"
+    });
+  }
+  return fylki;
+}
 /**
  * This function accepts the param and checks if it is of the correct format of a book.
  * @param {any} data
  */
 function testBookTemplate(data) {
   const fylki = [];
-  if (!(data.hasOwnProperty('title'))){
+  if (!(data.hasOwnProperty('title'))) {
     fylki.push({
-      Error: 'Incorrect format'});
-  } else if (!(data.hasOwnProperty('author'))){
-    fylki.push({ Error: "Incorrect format" });
-  } else if (!(data.hasOwnProperty('description'))){
-    fylki.push({ Error: "Incorrect format" });
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('author'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('description'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   } else if (!(data.hasOwnProperty('isbn10'))) {
-    fylki.push({ Error: "Incorrect format" });
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   } else if (!(data.hasOwnProperty('isbn13'))) {
-    fylki.push({ Error: "Incorrect format" });
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   } else if (!(data.hasOwnProperty('published'))) {
-    fylki.push({ Error: "Incorrect format" });
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   } else if (!(data.hasOwnProperty('language'))) {
-    fylki.push({ Error: "Incorrect format" });
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   } else if (!(data.hasOwnProperty('category'))) {
-    fylki.push({ Error: "Incorrect format" });
+    fylki.push({
+      Error: 'Incorrect format',
+    });
   }
   return fylki;
 }
