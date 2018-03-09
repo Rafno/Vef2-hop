@@ -8,7 +8,7 @@ async function create(){
         user: 'postgres',
        host: 'localhost',
        database: 'postgres',
-       password: 'Pluto050196',
+       password: 'MK301554',
         });
     await client.connect();
     for(let i = 0; books.length; i++) {

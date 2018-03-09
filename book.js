@@ -9,7 +9,7 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'Pluto050196',
+      password: 'MK301554',
     });
     await client.connect();
     let result;
@@ -28,7 +28,7 @@ async function getCategories() {
         user: 'postgres',
         host: 'localhost',
         database: 'library',
-        password: 'Pluto050196',
+        password: 'MK301554',
       });
     await client.connect();
     const gogn = await client.query('SELECT id,categories_name FROM categories;');
@@ -41,7 +41,7 @@ async function postCategories({categories_name} = {}) {
         user: 'postgres',
         host: 'localhost',
         database: 'library',
-        password: 'Pluto050196',
+        password: 'MK301554',
       });
     await client.connect();
     let gogn = await client.query('SELECT categories_name FROM categories where categories_name = $1',[
