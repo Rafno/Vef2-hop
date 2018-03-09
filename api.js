@@ -123,7 +123,7 @@ function errorHandler(username, password) {
 const {
   PORT: port = 3000,
   JWT_SECRET: jwtSecret,
-  TOKEN_LIFETIME: tokenLifetime = 1000000000000,
+  TOKEN_LIFETIME: tokenLifetime = 100000,
 } = process.env;
 
 if (!jwtSecret) {
@@ -247,14 +247,18 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
 
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
-  const { id, title, grade, judge } = req.body;
-  const books = await users.addReadBook(id, title, grade, judge);
+  const { title, grade, judge } = req.body;
+  const bookTitle = await users.findBookByTitle(title);
+  if (!(bookTitle)) {
+    return res.status(400).json({ Error: 'book does not exist' });
+  }
+  const books = await users.addReadBook(req.user.id, title, grade, judge);
   return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   const { id } = req.body;
   const books = await users.deleteReadBook(id);
-  return res.status(200).json({ books });
+  return res.status(200).json({ books_Deleted: books });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   const users_books = await users.readBooks(req.params.id);
@@ -263,9 +267,17 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   }
   return res.status(200).json({ users_books });
 });
+router.get('/users/:id', requireAuthentication, async (req, res) => {
+  const user = await users.findById(req.params.id);
+  if (user) {
+    return res.status(200).json({ user });
+  }
+  return res.status(400).json({ Error: 'User not found' });
+});
 
 // GET skilar síðu af flokkum
 router.get(
+<<<<<<< HEAD
   '/categories', requireAuthentication,
   async (req, res) => {
     let { offset = 0, limit = 10  } = req.query;
@@ -277,6 +289,11 @@ router.get(
     const data = await book.getCategories(limit, offset);
     const response = limiter(data, limit, offset, 'categories');
     res.status(200).json({ response });
+=======
+  '/categories', async (req, res) => {
+    const data = await book.getCategories();
+    res.status(200).json({ data });
+>>>>>>> 17a80dce1332051f90aaf01bd2b5f1be9c9bfb94
   });
 
 // POST býr til nýjan flokk
@@ -302,7 +319,7 @@ router.post(
 );
 // GET skilar síðu af bókum
 router.get(
-  '/books', requireAuthentication,
+  '/books',
   async (req, res) => {
     const { search } = req.query;
     let { offset = 0, limit = 10  } = req.query;
@@ -321,7 +338,7 @@ router.get(
     if(Object.keys(leita).length === 0){
         const villa = {
           field:" Error",
-          Error:" Sorry but you're search for '"+ search+ "' returned nothing",
+          Error:" Sorry but your search for '"+ search+ "' returned nothing",
         }
         res.status(400).json({ villa });
     } else {
@@ -330,11 +347,40 @@ router.get(
     }
 
   });
+function testBookTemplate(data) {
+  const fylki = [];
+  if (!(data.hasOwnProperty('title'))){
+    fylki.push({
+      Error: 'Incorrect format'});
+  } else if (!(data.hasOwnProperty('author'))){
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('description'))){
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('isbn10'))) {
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('isbn13'))) {
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('published'))) {
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('language'))) {
+    fylki.push({ Error: "Incorrect format" });
+  } else if (!(data.hasOwnProperty('category'))) {
+    fylki.push({ Error: "Incorrect format" });
+  }
+  return fylki;
+}
 // POST býr til nýja bók ef hún er gild og skilar
 router.post(
   '/books', requireAuthentication,
   async (req, res) => {
+    let fylki = []
     const data = req.body;
+    if (testBookTemplate(data).length != 0) {
+      fylki = testBookTemplate(data);
+      res.status(400).json({ fylki });
+      return;
+    }
+    console.log("hey");
     let errarray = [];
     errarray = postBooksError(data);
     if (errarray.length === 0) {
