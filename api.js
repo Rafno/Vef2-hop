@@ -209,8 +209,12 @@ function requireAuthentication(req, res, next) {
 // Lykilorðs hash skal ekki vera sýnilegt
 router.get('/users',
   requireAuthentication, async (req, res) => {
-    const results = await users.findAll();
-    return res.status(200).json({ results });
+    let { offset = 0, limit = 10  } = req.query;
+    offset = Number(offset);
+    limit = Number(limit);
+    const data = await users.findAll();
+    const response = limiter(data, limit, offset,'users');
+    return res.status(200).json({ response });
   });
 
 // GET skilar stökum notanda ef til
@@ -247,12 +251,12 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
 
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
-  const { title, grade, judge } = req.body;
-  const bookTitle = await users.findBookByTitle(title);
+  const { booksread_title, booksread_grade, booksread_judge } = req.body;
+  const bookTitle = await users.findBookByTitle(booksread_title);
   if (!(bookTitle)) {
     return res.status(400).json({ Error: 'book does not exist' });
   }
-  const books = await users.addReadBook(req.user.id, title, grade, judge);
+  const books = await users.addReadBook(req.user.id, booksread_title, booksread_grade, booksread_judge);
   return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
@@ -264,6 +268,7 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
     return res.status(200).json({ Success: 'Book deleted' });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
+
   const user = await users.findById(req.params.id);
   if (user) {
     const userID = await users.readBooks(user.id);
@@ -272,6 +277,17 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
     }
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
+  // TODO HELGI
+  let { offset = 0, limit = 10  } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+  const users_books = await users.readBooks(req.params.id);
+  if (users_books === null) {
+    return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
+  }
+  const response = limiter(users_books, limit, offset, 'users/:id/read');
+  return res.status(200).json({ users_books });
+
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
   const user = await users.findById(req.params.id);
@@ -289,9 +305,6 @@ router.get(
     let { offset = 0, limit = 10  } = req.query;
     offset = Number(offset);
     limit = Number(limit);
-    console.log(typeof(limit));
-    console.log(typeof(offset))
-    console.log("hallo");
     const data = await book.getCategories(limit, offset);
     const response = limiter(data, limit, offset, 'categories');
     res.status(200).json({ response });
@@ -326,7 +339,6 @@ router.get(
     let { offset = 0, limit = 10  } = req.query;
     offset = Number(offset);
     limit = Number(limit);
-    console.info(typeof(search));
     let leita = {};
     if(typeof(search) === 'string'){
       leita = await book.searchBooks(search, limit, offset);
@@ -385,7 +397,6 @@ router.post(
       res.status(400).json({ fylki });
       return;
     }
-    console.log("hey");
     let errarray = [];
     errarray = postBooksError(data);
     if (errarray.length === 0) {

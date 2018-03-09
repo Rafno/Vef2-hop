@@ -96,6 +96,7 @@ async function readBooks(id) {
   }
   const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1;';
   const result = await query(q, [id]);
+
   if (result.rowCount === 0) {
     return null;
   }
@@ -118,8 +119,10 @@ async function deleteReadBook(book_id) {
   return result.rows;
 }
 async function findBookByTitle(title) {
+ 
   const q = 'SELECT title from books WHERE title = $1';
   const result = await query(q, [title]);
+
   if (result.rowCount === 0) {
     return null;
   }
