@@ -154,7 +154,7 @@ router.post(
   '/register',
   async (req, res) => {
     let error = [];
-    const { username, password, name } = req.body;
+    const { username, password, name, urlpic } = req.body;
     error = errorHandler(username, password);
     if (error.length > 0) {
       return res.status(400).json({ error });
@@ -163,7 +163,7 @@ router.post(
     if (user) {
       return res.status(401).json({ error: 'User already exists' });
     }
-    const registeredUser = await users.createUser(username, password, name);
+    const registeredUser = await users.createUser(username, password, name, urlpic);
     return res.status(201).json({ Success: username + ' has been created' });
   });
 router.use(passport.initialize());
@@ -274,20 +274,19 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   return res.status(200).json({ Success: 'Book deleted' });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
-  let { offset = 0, limit = 10  } = req.query;
+  let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
   limit = Number(limit);
   const user = await users.findById(req.params.id);
   if (user) {
     const userID = await users.readBooks(user.id);
     if (userID) {
-      const response = limiter(userID, limit, offset, 'users/'+req.params.id+'/read');
+      const response = limiter(userID, limit, offset, 'users/' + req.params.id + '/read');
       return res.status(200).json({ response });
 
     }
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
-  // TODO HELGI
   let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
   limit = Number(limit);
