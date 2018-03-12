@@ -274,6 +274,19 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   return res.status(200).json({ Success: 'Book deleted' });
 });
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
+  let { offset = 0, limit = 10 } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+  const user = await users.findById(req.params.id);
+  if (user) {
+    const userID = await users.readBooks(user.id);
+    if (userID) {
+      const response = limiter(userID, limit, offset, 'users/' + req.params.id + '/read');
+      return res.status(200).json({ response });
+
+    }
+  }
+  return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
 
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
