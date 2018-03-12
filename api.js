@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const Cloudinary = require('cloudinary');
 
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
