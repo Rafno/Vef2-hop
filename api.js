@@ -287,15 +287,6 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
     }
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
-  let { offset = 0, limit = 10 } = req.query;
-  offset = Number(offset);
-  limit = Number(limit);
-  const users_books = await users.readBooks(req.params.id);
-  if (users_books === null) {
-    return res.status(401).json({ Empty: 'This user does not exist or has not read any books' });
-  }
-  const response = limiter(users_books, limit, offset, 'users/:id/read');
-  return res.status(200).json({ users_books });
 
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
