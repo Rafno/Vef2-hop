@@ -2,15 +2,17 @@
 const { Client } = require('pg');
 const xss = require('xss');
 
-// const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL || 'library://:@localhost/postgres';
+/**
+ * Hjálparfall sem Óli gaf,
+ * tekur inn Query og gildi
+ * skilar töflu frá client query.
+ * @param {String} q
+ * @param {Object} values
+ */
 async function query(q, values = []) {
-  // const client = new Client({ connectionString });
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'library',
-    password: 'MK301554',
-  });
+  const client = new Client({ connectionString });
+
   await client.connect();
   let result;
   try {
@@ -23,19 +25,28 @@ async function query(q, values = []) {
   return result;
 }
 // -------------- Föll fyrir Categories ------------------ //
+/**
+ * Grípur lista af categories en kemur í veg fyrir að
+ * taflan sé á röngu sniði, limit tekur inn int sem
+ * stjórnar stökum sem komast fyrir í listanum.
+ * Offset tekur in int sem stýrir hvar listinn byrjar.
+ * @param {int} LIMIT
+ * @param {int} OFFSET
+ */
 async function getCategories(LIMIT, OFFSET) {
   const q = 'SELECT id,categoriesName FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
   const gogn = await query(q, [LIMIT, OFFSET]);
   return gogn.rows;
 }
-
+/**
+ * Bætir við nýjum category, sem fremur að það category hefur ekki nú þegar komið fyrir
+ * Ath. skoðar ekki hástafi/lástafi. Science-fiction, science-Fiction og aðrar útgáfur af
+ * þessu nafni geta verið til í sömu töflu.
+ * @param {String} categoriesName
+ */
 async function postCategories({ categoriesName } = {}) {
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'library',
-    password: 'MK301554',
-  });
+  const client = new Client({ connectionString });
+
   await client.connect();
   let gogn = await client.query('SELECT categoriesName FROM categories where categoriesName = $1', [
     xss(categoriesName),
@@ -49,13 +60,35 @@ async function postCategories({ categoriesName } = {}) {
   await client.end();
   return gogn.rows;
 }
+/**
+ * Grípur lista af bókum en kemur í veg fyrir að
+ * taflan sé á röngu sniði, limit tekur inn int sem
+ * stjórnar stökum sem komast fyrir í listanum.
+ * Offset tekur in int sem stýrir hvar listinn byrjar.
+ * @param {int} LIMIT
+ * @param {int} OFFSET
+ */
 async function getBooks(LIMIT, OFFSET) {
   const q = 'SELECT id, title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books ORDER BY title LIMIT $1 OFFSET $2 ';
   const gogn = await query(q, [LIMIT, OFFSET]);
   return gogn.rows;
 }
+/**
+ * Býr til nýja bók ef bóking er á réttu sniði.
+ * Skilar villu ef bókin er nú þegar til.
+ * @param {any} res
+ * @param {jsonObject} book_information
+ */
 async function postBooks(res, {
-  title, author, description, isbn10, isbn13, published, pagecount, language, category,
+  title,
+  author,
+  description,
+  isbn10,
+  isbn13,
+  published,
+  pagecount,
+  language,
+  category,
 } = {}) {
   const checkarray = [];
   let q = 'SELECT title FROM books WHERE title = $1';
@@ -93,8 +126,22 @@ async function postBooks(res, {
   }
   return res.status(400).json(checkarray);
 }
+/**
+ * Breytir upplýsingum um bók ef bók er á réttu sniði og ef bók er til í listanum.
+ * @param {any} res
+ * @param {JsonObject} book_information
+ */
 async function patchBooksById(res, {
-  id, title, author, description, isbn10, isbn13, published, pagecount, language, category,
+  id,
+  title,
+  author,
+  description,
+  isbn10,
+  isbn13,
+  published,
+  pagecount,
+  language,
+  category,
 } = {}) {
   const checkarray = [];
   let q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books WHERE id = $1';
@@ -142,6 +189,11 @@ async function patchBooksById(res, {
     res.status(400).json(checkarray);
   }
 }
+/**
+ * Skilar stakri bók sem passar við ID gefið.
+ * @param {int} id
+ * @param {any} res
+ */
 async function getBooksById(id, res) {
   const q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books Where id = $1';
   const svar = await query(q, [id]);
@@ -157,6 +209,14 @@ async function getBooksById(id, res) {
   res.status(400).json({ villa });
   return null;
 }
+/**
+ * Leitar að bók miðað við upplýsingar gefnar,
+ * skilar á sniði gefið með limit/offset
+ * (Sjá postCategories fyrir útskýringu á limit/offset)
+ * @param {String} search
+ * @param {int} LIMIT
+ * @param {int} OFFSET
+ */
 async function searchBooks(search = '', LIMIT, OFFSET) {
   try {
     const q = `

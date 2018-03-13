@@ -7,12 +7,22 @@ const router = express.Router();
 router.use(express.json());
 
 /* --------------Villumeðhöndlun -----------------------*/
+
+/**
+ * Boolean fall sem skodar hvort object se af string type.
+ * Kemur i veg fyrir ad categories se sett inn sem er ekki string.
+ * @param {any} gogn
+ */
 function postCategoriesError(gogn) {
   if (typeof (gogn) === 'string') {
     return true;
   }
   return false;
 }
+/**
+ * Villumelding fyrir post router i books se i rettu formi.
+ * @param {any} gogn
+ */
 function postBooksError(gogn) {
   const fylki = [];
   if (gogn.title.length === 0) {
@@ -74,6 +84,12 @@ function postBooksError(gogn) {
   return fylki;
 }
 
+/**
+ * Errorhandler a username/password,
+ * skodar i register/login hvort inntak a username/pw se rett.
+ * @param {any} username
+ * @param {any} password
+ */
 function errorHandler(username, password) {
   const fylki = [];
   if (password.length < 6) {
@@ -90,6 +106,11 @@ function errorHandler(username, password) {
   }
   return fylki;
 }
+/**
+ * bookTemplate kemur i veg fyrir ad book taki a moti rongu snidi.
+ * Skilar incorrect format ef eitthvad passar ekki upp.
+ * @param {any} data
+ */
 function testBookTemplate(data) {
   const fylki = [];
   if (!(Object.prototype.hasOwnProperty.call(data, 'title'))) {

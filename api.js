@@ -14,6 +14,14 @@ const router = express.Router();
 const uploads = multer({ dest: './temp' });
 router.use(express.json());
 
+/**
+ * Ég biðst innilegrar afsökunar til þanns kennara sem fer yfir þetta.
+ * Routerum skipt i eftirfarandi:
+ * registration, login
+ * sidan users, users/me, users:id,
+ * sidan categories og ad lokum books.
+ */
+
 const {
   PORT: port = 3000,
   JWT_SECRET: jwtSecret,
@@ -37,7 +45,14 @@ async function strat(data, next) {
     next(null, false);
   }
 }
-// Föll sem er hægt að kalla á í users.js
+// Hjarlparfoll sem er hægt að kalla á í users.js
+/**
+ * Limiter skiptir sql nidurstodum i sidur. Adeins 10 stok mega birtast fyrir hvert query.
+ * @param {any} data
+ * @param {any} limit
+ * @param {any} offset
+ * @param {any} type
+ */
 function limiter(data, limit, offset, type) {
   const result = {
     links: {
@@ -59,6 +74,12 @@ function limiter(data, limit, offset, type) {
   }
   return result;
 }
+/**
+ * Token Authenticator, gefid af Ola.
+ * @param {any} req
+ * @param {any} res
+ * @param {any} next
+ */
 function requireAuthentication(req, res, next) {
   return passport.authenticate(
     'jwt',
@@ -80,7 +101,13 @@ function requireAuthentication(req, res, next) {
   )(req, res, next);
 }
 
-// Allir routerar settir í sömu röð og gefið í dæminu.
+// --Allir routerar settir í sömu röð og gefið í dæminu.--
+
+/**
+ * Byr til nyjan user og setur inn i sql tofluna users.
+ * Krafa ad username er unique, skodar adur en tad baetir vid user
+ * ad username se ekki nu thegar stadsett i toflunni.
+ */
 router.post(
   '/register',
   async (req, res) => {
@@ -98,6 +125,10 @@ router.post(
     return res.status(201).json({ Success: `${username} has been created` });
   },
 );
+/**
+ * Skrair notanda inn sem fremur ad user stemmi i sql toflunni
+ * eftir ad handshake a ser stad ta er gefid user token.
+ */
 router.post(
   '/login',
   async (req, res) => {
@@ -121,7 +152,7 @@ router.post(
 );
 
 // GET skilar stökum notanda ef til
-// Lykilorðs hash skal ekki vera sýnilegt
+// Lykilorðs hash er ekki sýnilegt
 router.get(
   '/users',
   requireAuthentication, async (req, res) => {
@@ -135,13 +166,13 @@ router.get(
 );
 
 // GET skilar stökum notanda ef til
-// Lykilorðs hash skal ekki vera sýnilegt
+// Lykilorðs hash er ekki sýnilegt
 router.get('/users/me', requireAuthentication, async (req, res) => {
   const { id, username, name } = await users.findById(req.user.id);
   return res.status(200).json({ identity: id, username, name });
 });
+// PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn
 router.patch('/users/me', requireAuthentication, async (req, res) => {
-  // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn
   let error = [];
   const { username, password, name } = req.body;
 
@@ -154,10 +185,10 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
     Success: 'Your account has been modified', username, password, name,
   });
 });
-router.post('/users/me/profile', requireAuthentication, uploads.single('profile'), cloud.upload);
 // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
-router.get('/users/me/read', requireAuthentication, async (req, res) => {
+router.post('/users/me/profile', requireAuthentication, uploads.single('profile'), cloud.upload);
 // GET skilar síðu af lesnum bókum innskráðs notanda
+router.get('/users/me/read', requireAuthentication, async (req, res) => {
   let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
   limit = Number(limit);
@@ -168,8 +199,8 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
   const response = limiter(myBooks, limit, offset, '/users/me/read');
   return res.status(200).json({ response });
 });
+// POST býr til nýjan lestur á bók og skilar, grade, id, title, text
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
-  // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
   const { title, grade, judge } = req.body;
   const bookTitle = await users.findBookByTitle(title);
   if (!(bookTitle)) {
@@ -178,6 +209,7 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
   const books = await users.addReadBook(req.user.id, title, grade, judge);
   return res.status(200).json({ books });
 });
+// DELETE eydir lesni bok.
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   const { id } = req.params;
   const books = await users.deleteReadBook(id);
@@ -186,6 +218,7 @@ router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   }
   return res.status(200).json({ Success: 'Book deleted' });
 });
+// GET skilar ollum bokum sem valin notandi hefur lesid.
 router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
@@ -200,6 +233,7 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
 });
+// GET skilar upplysingar um notanda, synir ekki lykilord.
 router.get('/users/:id', requireAuthentication, async (req, res) => {
   const user = await users.findById(req.params.id);
   if (user) {
@@ -270,7 +304,6 @@ router.get(
     }
   },
 );
-
 // POST býr til nýja bók ef hún er gild og skilar
 router.post(
   '/books', requireAuthentication,
@@ -302,6 +335,7 @@ router.post(
     }
   },
 );
+// GET nær í upplýsingar um bók og skilar.
 router.get(
   '/books/:id', requireAuthentication,
   async (req, res) => {
@@ -318,7 +352,7 @@ router.get(
     }
   },
 );
-
+// PATCH breytir upplýsingum um bók ef á gildu formi.
 router.patch(
   '/books/:id', requireAuthentication,
   async (req, res) => {
