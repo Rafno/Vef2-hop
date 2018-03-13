@@ -39,7 +39,7 @@ async function query(q, values = []) {
  * @param {int} OFFSET
  */
 async function getCategories(LIMIT, OFFSET) {
-  const q = 'SELECT id,categoriesName FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
+  const q = 'SELECT id,categories_name FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
   const gogn = await query(q, [LIMIT, OFFSET]);
   return gogn.rows;
 }
@@ -50,7 +50,7 @@ async function getCategories(LIMIT, OFFSET) {
  * Hér má einnig sjá eina skiptið sem við notum xss
  * @param {String} categoriesName
  */
-async function postCategories({ categoriesName } = {}) {
+async function postCategories({ categories_name } = {}) {
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
@@ -58,15 +58,16 @@ async function postCategories({ categoriesName } = {}) {
     password: 'Pluto050196',
   });
   await client.connect();
-  let gogn = await client.query('SELECT categoriesName FROM categories where categoriesName = $1', [
-    xss(categoriesName),
+  let gogn = await client.query('SELECT categories_name FROM categories where categories_name = $1', [
+    xss(categories_name),
   ]);
   if (gogn.rowCount === 1) {
     return null;
   }
-  gogn = await client.query('INSERT INTO categories (categoriesName) VALUES($1);', [
-    xss(categoriesName),
+  gogn = await client.query('INSERT INTO categories (categories_name) VALUES($1);', [
+    xss(categories_name),
   ]);
+  console.log("hæ")
   await client.end();
   return gogn.rows;
 }
