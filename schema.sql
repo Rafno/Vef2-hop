@@ -64,6 +64,7 @@ insert into categories(categories_name) Values('Computer Science');
  * Sï¿½ï¿½ufjï¿½ldi, tala, stï¿½rri en 0, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
  * Tungumï¿½l, 2 stafa strengur, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
 */
+
 create table books(
 id serial primary key,
 title varchar(999) NOT NULL CHECK (title <> ''),
