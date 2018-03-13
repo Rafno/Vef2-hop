@@ -39,7 +39,6 @@ async function upload(req, res, next) {
   const { url } = upload;
   await users.editPic(req.user.id, url);
   return res.status(200).json({ Success: 'Your account has been modified', url });
-
 }
 app.post('/upload', uploads.single('image'), upload);
 

@@ -45,7 +45,7 @@ async function postCategories({ categoriesName } = {}) {
   }
   gogn = await client.query('INSERT INTO categories (categoriesName) VALUES($1);', [
     xss(categoriesName),
-  ])
+  ]);
   await client.end();
   return gogn.rows;
 }
@@ -78,7 +78,17 @@ async function postBooks(res, {
   }
   if (checkarray.length === 0) {
     q = 'INSERT INTO books (title, author, description, isbn10, isbn13, published, pagecount, language, category) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
-    results = await query(q, [title, author, description, isbn10, isbn13, published, pagecount, language, category]);
+    results = await query(q, [
+      title,
+      author,
+      description,
+      isbn10,
+      isbn13,
+      published,
+      pagecount,
+      language,
+      category,
+    ]);
     return results.rows;
   }
   return res.status(400).json(checkarray);
@@ -116,7 +126,18 @@ async function patchBooksById(res, {
   }
   if (checkarray.length === 0) {
     q = 'UPDATE books SET title = $1, author = $2, description = $3, isbn10 = $4, isbn13 = $5, published = $6, pagecount = $7, language = $8, category = $9 WHERE id = $10;';
-    results = await query(q, [title, author, description, isbn10, isbn13, published, pagecount, language, category, id]);
+    results = await query(q, [
+      title,
+      author,
+      description,
+      isbn10,
+      isbn13,
+      published,
+      pagecount,
+      language,
+      category,
+      id,
+    ]);
   } else {
     res.status(400).json(checkarray);
   }
@@ -160,4 +181,4 @@ module.exports = {
   getBooksById,
   patchBooksById,
   searchBooks,
-}
+};

@@ -1,8 +1,9 @@
 require('dotenv').config();
 
 const express = require('express');
-const app = express();
 const api = require('./api');
+
+const app = express();
 app.use('/', api);
 
 /**
@@ -11,15 +12,12 @@ app.use('/', api);
  * inniheldur router sem leyfir aðila að skrá sig inn sem admin/user.
  * Innskráð á admin með útskýringu frá Óla:
  * {"username": "admin", "password": "123"} í postman.
- * {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNTE5MjU2NDkzLCJleHAiOjE1MTkyNTY1MTN9.5mArJhUdr6fAPQQT1i0f6CgIY_-iO_Oa5odgRkEOJRY"}
  * Til að auðkenna þarf að senda POST á http://localhost:3000 með JSON sem inniheldur username og password fyrir notanda.
  * Ef notandi og lykilorð eru rétt er jwt token skilað, annars koma villuskilaboð.
 */
 const {
   PORT: port = 3000,
 } = process.env;
-
-
 
 function notFoundHandler(req, res, next) { // eslint-disable-line
   res.status(404).json({ error: 'Not found' });
