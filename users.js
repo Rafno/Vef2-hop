@@ -48,7 +48,7 @@ async function comparePasswords(hash, password) {
  * @param {String} username
  */
 async function findByUsername(username) {
-  const q = 'SELECT username, password,name,password FROM users WHERE username = $1';
+  const q = 'SELECT id, username, password,name,password FROM users WHERE username = $1';
 
   const result = await query(q, [username]);
 
