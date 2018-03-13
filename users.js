@@ -85,11 +85,16 @@ async function editUser(id, username, password, name) {
     return null;
   }
   const hashedPassword = await bcrypt.hash(password, 11);
-  const q = 'UPDATE users SET username = $1, password = $2, name = $3 WHERE id = $4;';
+  const q = 'UPDATE users SET username = $1, password = $2, name = $3 WHERE id = $5;';
   const result = await query(q, [username, hashedPassword, name, id]);
   return result.rows[0];
 }
-
+async function editPic(id, urlPic) {
+  const q = 'UPDATE users SET urlpic = $1 WHERE id = $2;';
+  console.log(id, urlPic);
+  const result = await query(q, [urlPic, id]);
+  return result.rows[0];
+}
 async function readBooks(id, limit, offset) {
   if (!findById(id)) {
     return null;
@@ -139,4 +144,5 @@ module.exports = {
   addReadBook,
   deleteReadBook,
   findBookByTitle,
+  editPic,
 }

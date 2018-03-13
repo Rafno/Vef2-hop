@@ -3,6 +3,7 @@ const cloudinary = require('cloudinary');
 const express = require('express');
 const multer = require('multer');
 const uploads = multer({ dest: './temp' });
+const users = require('./users');
 
 const {
   PORT: port = 3000,
@@ -25,10 +26,11 @@ cloudinary.config({
 const app = express();
 async function upload(req, res, next) {
   const { file: { path } = {} } = req;
-console.log(req.file)
   if (!path) {
     return res.send('gat ekki lesið mynd');
   }
+  
+
 
   let upload = null;
 
@@ -40,8 +42,8 @@ console.log(req.file)
   }
 
   const { secure_url } = upload;
-
-  res.send(secure_url);
+    const updated = await users.editPic(req.user.id, secure_url);
+  res.status(200).json({ Success: 'Your account has been modified', secure_url });
 }
 app.post('/upload', uploads.single('image'), upload);
 
