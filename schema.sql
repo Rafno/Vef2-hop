@@ -31,24 +31,24 @@ create table users(
 */
 create table categories(
 id serial primary key,
-categories_name varchar(99) NOT NULL CHECK (categories_name <> ''),
-UNIQUE(categories_name)
+categoriesName varchar(99) NOT NULL CHECK (categoriesName <> ''),
+UNIQUE(categoriesName)
 );
 /*
  * Insert skipanir fyrir töfluna categories
 */
-insert into categories(categories_name) Values('Fiction');
-insert into categories(categories_name) Values('Nonfiction');
-insert into categories(categories_name) Values('Science Fiction');
-insert into categories(categories_name) Values('Fantasy');
-insert into categories(categories_name) Values('Comic');
-insert into categories(categories_name) Values('Psychology');
-insert into categories(categories_name) Values('Design');
-insert into categories(categories_name) Values('Horror');
-insert into categories(categories_name) Values('Economics');
-insert into categories(categories_name) Values('Graphic Novel');
-insert into categories(categories_name) Values('Business');
-insert into categories(categories_name) Values('Computer Science');
+insert into categories(categoriesName) Values('Fiction');
+insert into categories(categoriesName) Values('Nonfiction');
+insert into categories(categoriesName) Values('Science Fiction');
+insert into categories(categoriesName) Values('Fantasy');
+insert into categories(categoriesName) Values('Comic');
+insert into categories(categoriesName) Values('Psychology');
+insert into categories(categoriesName) Values('Design');
+insert into categories(categoriesName) Values('Horror');
+insert into categories(categoriesName) Values('Economics');
+insert into categories(categoriesName) Values('Graphic Novel');
+insert into categories(categoriesName) Values('Business');
+insert into categories(categoriesName) Values('Computer Science');
 
 
 /* ++++++++++ 3 tafla lysing ++++++++++
@@ -76,7 +76,7 @@ language char(2),
 category varchar(99) NOT NULL,
 UNIQUE(title),
 UNIQUE(isbn13),
-FOREIGN KEY(category) REFERENCES categories(categories_name)
+FOREIGN KEY(category) REFERENCES categories(categoriesName)
 );
 
 /* ++++++++++ 4 tafla lysing  ++++++++++
