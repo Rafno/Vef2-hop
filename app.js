@@ -1,14 +1,10 @@
 require('dotenv').config();
 
 const express = require('express');
-const passport = require('passport');
-const { Strategy, ExtractJwt } = require('passport-jwt');
-const jwt = require('jsonwebtoken');
-const users = require('./users');
 const app = express();
 const api = require('./api');
 app.use('/', api);
-const books = ('./data/');
+
 /**
  * APP tekið frá Óla dæmi.
  * Býr til token sem leyfir aðila að vera innskráður í spes mikinn tíma (óviss hversu langur)
@@ -21,42 +17,9 @@ const books = ('./data/');
 */
 const {
   PORT: port = 3000,
-  JWT_SECRET: jwtSecret,
-  TOKEN_LIFETIME: tokenLifetime = 2000,
 } = process.env;
 
-if (!jwtSecret) {
-  console.error('JWT_SECRET not registered in .env');
-  process.exit(1);
-}
 
-app.use(express.json());
-
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: jwtSecret,
-}
-
-async function strat(data, next) {
-  const user = await users.findById(data.id);
-
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
-  }
-}
-
-passport.use(new Strategy(jwtOptions, strat));
-
-app.use(passport.initialize());
-
-app.get('/', (req, res) => {
-  res.json({
-    login: '/login',
-    admin: '/admin',
-  });
-});
 
 function notFoundHandler(req, res, next) { // eslint-disable-line
   res.status(404).json({ error: 'Not found' });
