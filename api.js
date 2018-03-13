@@ -265,7 +265,7 @@ router.get(
       };
       res.status(400).json({ villa });
     } else {
-      const response = limiter(leita, limit, offset);
+      const response = limiter(leita, limit, offset, `books?search${search}`);
       res.status(200).json({ response });
     }
   },
