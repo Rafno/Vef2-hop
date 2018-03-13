@@ -16,7 +16,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'Pluto050196',
+    password: 'MK301554',
   });
   await client.connect();
   let result;
@@ -51,11 +51,12 @@ async function getCategories(LIMIT, OFFSET) {
  * @param {String} categoriesName
  */
 async function postCategories({ categoriesName } = {}) {
+  // const client = new Client({ connectionString });
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'Pluto050196',
+    password: 'MK301554',
   });
   await client.connect();
   let gogn = await client.query('SELECT categoriesName FROM categories where categoriesName = $1', [
