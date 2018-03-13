@@ -11,9 +11,34 @@ const cloud = require('./cloudinary');
 const multer = require('multer');
 const uploads = multer({ dest: './temp' });
 const errors = require('./villuHandler');
-
+const app = require('./app');
 router.use(express.json());
 
+
+
+const {
+  PORT: port = 3000,
+  JWT_SECRET: jwtSecret,
+  TOKEN_LIFETIME: tokenLifetime = 100000,
+} = process.env;
+
+if (!jwtSecret) {
+  console.error('JWT_SECRET not registered in .env');
+  process.exit(1);
+}
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret,
+}
+
+async function strat(data, next) {
+  const user = await users.findById(data.id);
+  if (user) {
+    next(null, user);
+  } else {
+    next(null, false);
+  }
+}
 // Föll sem er hægt að kalla á í users.js
 function limiter(data, limit, offset, type) {
   const result = {
@@ -36,43 +61,33 @@ function limiter(data, limit, offset, type) {
   }
   return result;
 }
+function requireAuthentication(req, res, next) {
+  return passport.authenticate(
+    'jwt',
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
 
+      if (!user) {
+        const error = info.name === 'TokenExpiredError' ? 'expired token' : 'invalid token';
+        return res.status(401).json({ error });
+      }
 
-const {
-  PORT: port = 3000,
-  JWT_SECRET: jwtSecret,
-  TOKEN_LIFETIME: tokenLifetime = 100000,
-} = process.env;
-
-if (!jwtSecret) {
-  console.error('JWT_SECRET not registered in .env');
-  process.exit(1);
+      req.user = user;
+      next();
+    }
+  )(req, res, next);
 }
-const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: jwtSecret,
-}
-
-// TODO, setja token a betri stad.
-async function strat(data, next) {
-  const user = await users.findById(data.id);
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
-  }
-}
-
-passport.use(new Strategy(jwtOptions, strat));
 
 // Allir routerar settir í sömu röð og gefið í dæminu.
-// TODO, þarf að geta tekið inn mynd.
 router.post(
   '/register',
   async (req, res) => {
     let error = [];
     const { username, password, name } = req.body;
-    error = errorHandler(username, password);
+    error = errors.errorHandler(username, password);
     if (error.length > 0) {
       return res.status(400).json({ error });
     }
@@ -83,7 +98,6 @@ router.post(
     const registeredUser = await users.createUser(username, password, name);
     return res.status(201).json({ Success: username + ' has been created' });
   });
-router.use(passport.initialize());
 router.post(
   '/login',
   async (req, res) => {
@@ -104,25 +118,7 @@ router.post(
     }
     return res.status(401).json({ error: 'Invalid password' });
   });
-function requireAuthentication(req, res, next) {
-  return passport.authenticate(
-    'jwt',
-    { session: false },
-    (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
 
-      if (!user) {
-        const error = info.name === 'TokenExpiredError' ? 'expired token' : 'invalid token';
-        return res.status(401).json({ error });
-      }
-
-      req.user = user;
-      next();
-    }
-  )(req, res, next);
-}
 // GET skilar stökum notanda ef til
 // Lykilorðs hash skal ekki vera sýnilegt
 router.get('/users',
@@ -153,11 +149,9 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
   await users.editUser(req.user.id, username, password, name);
   return res.status(200).json({ Success: 'Your account has been modified', username, password, name });
 });
-
 router.post('/users/me/profile', requireAuthentication, uploads.single('profile'), cloud.upload, async (req, res) => {
   // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 });
-
 router.get('/users/me/read', requireAuthentication, async (req, res) => {
   // GET skilar síðu af lesnum bókum innskráðs notanda
   let { offset = 0, limit = 10 } = req.query;
@@ -170,7 +164,6 @@ router.get('/users/me/read', requireAuthentication, async (req, res) => {
   const response = limiter(my_books, limit, offset, '/users/me/read');
   return res.status(200).json({ response });
 });
-
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
   const { booksread_title, booksread_grade, booksread_judge } = req.body;
@@ -212,10 +205,8 @@ router.get('/users/:id', requireAuthentication, async (req, res) => {
   }
   return res.status(400).json({ Error: 'User not found' });
 });
-
 // GET skilar síðu af flokkum
 router.get(
-
   '/categories', requireAuthentication,
   async (req, res) => {
     let { offset = 0, limit = 10 } = req.query;
@@ -231,7 +222,7 @@ router.post(
   '/categories', requireAuthentication,
   async (req, res) => {
     const data = req.body;
-    if (postCategoriesError(data.categories_name) === true) {
+    if (errors.postCategoriesError(data.categories_name) === true) {
       const gogn = await book.postCategories({
         categories_name: data.categories_name,
       });
@@ -277,60 +268,19 @@ router.get(
 
   });
 
-/**
- * This function accepts the param and checks if it is of the correct format of a book.
- * @param {any} data
- */
-function testBookTemplate(data) {
-  const fylki = [];
-  if (!(data.hasOwnProperty('title'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('author'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('description'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('isbn10'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('isbn13'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('published'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('language'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  } else if (!(data.hasOwnProperty('category'))) {
-    fylki.push({
-      Error: 'Incorrect format',
-    });
-  }
-  return fylki;
-}
 // POST býr til nýja bók ef hún er gild og skilar
 router.post(
   '/books', requireAuthentication,
   async (req, res) => {
     let fylki = []
     const data = req.body;
-    if (testBookTemplate(data).length != 0) {
-      fylki = testBookTemplate(data);
+    if (errors.testBookTemplate(data).length != 0) {
+      fylki = errors.testBookTemplate(data);
       res.status(400).json({ fylki });
       return;
     }
     let errarray = [];
-    errarray = postBooksError(data);
+    errarray = errors.postBooksError(data);
     if (errarray.length === 0) {
       const gogn = await book.postBooks(res, {
         title: data.title,
@@ -371,7 +321,7 @@ router.patch(
     const { id } = req.params;
     const data = req.body;
     let errarray = [];
-    errarray = postBooksError(data);
+    errarray = errors.postBooksError(data);
     if (errarray.length === 0) {
       const gogn = await book.patchBooksById(res, {
         id: id,
@@ -392,4 +342,6 @@ router.patch(
   }
 );
 
+passport.use(new Strategy(jwtOptions, strat));
+router.use(passport.initialize());
 module.exports = router;

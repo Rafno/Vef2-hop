@@ -13,10 +13,6 @@ const uploads = multer({ dest: './temp' });
 
 router.use(express.json());
 
-function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
-
 /* --------------Villumeðhöndlun -----------------------*/
 function postCategoriesError(gogn) {
   if (typeof (gogn) === 'string') {
@@ -100,4 +96,47 @@ function errorHandler(username, password) {
     fylki.push(error);
   }
   return fylki;
+}
+function testBookTemplate(data) {
+  const fylki = [];
+  if (!(data.hasOwnProperty('title'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('author'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('description'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('isbn10'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('isbn13'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('published'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('language'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  } else if (!(data.hasOwnProperty('category'))) {
+    fylki.push({
+      Error: 'Incorrect format',
+    });
+  }
+  return fylki;
+}
+module.exports = {
+  errorHandler,
+  postBooksError,
+  postCategoriesError,
+  testBookTemplate,
 }
