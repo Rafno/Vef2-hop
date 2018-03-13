@@ -2,7 +2,6 @@ require('dotenv').config();
 const cloudinary = require('cloudinary');
 const express = require('express');
 const multer = require('multer');
-
 const uploads = multer({ dest: './temp' });
 
 const {
@@ -24,7 +23,6 @@ cloudinary.config({
 });
 
 const app = express();
-
 async function upload(req, res, next) {
   const { file: { path } = {} } = req;
 console.log(req.file)

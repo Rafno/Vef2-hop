@@ -3,8 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const Cloudinary = require('cloudinary');
-
+const cloud = require('./cloudinary');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
 const users = require('./users');
@@ -155,6 +154,7 @@ router.post(
   async (req, res) => {
     let error = [];
     const { username, password, name, urlpic } = req.body;
+    const Surlpic = cloud.upload(urlpic);
     error = errorHandler(username, password);
     if (error.length > 0) {
       return res.status(400).json({ error });

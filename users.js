@@ -17,7 +17,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'Pluto050196',
+    password: 'MK301554',
   });
   await client.connect();
 
@@ -71,12 +71,12 @@ async function findById(id) {
   return null;
 }
 
-async function createUser(username, password, name,urlpic) {
+async function createUser(username, password, name, urlpic) {
   const hashedPassword = await bcrypt.hash(password, 11);
 
   const q = 'INSERT INTO users (username, password, name, urlpic) VALUES ($1, $2, $3, $4) RETURNING *';
 
-  const result = await query(q, [username, hashedPassword, name,urlpic]);
+  const result = await query(q, [username, hashedPassword, name, urlpic]);
 
   return result.rows[0];
 }
@@ -119,7 +119,7 @@ async function deleteReadBook(book_id) {
   return result.rows;
 }
 async function findBookByTitle(title) {
- 
+
   const q = 'SELECT title from books WHERE title = $1';
   const result = await query(q, [title]);
 
