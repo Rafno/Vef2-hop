@@ -113,7 +113,7 @@ router.post(
   async (req, res) => {
     let error = [];
     const { username, password, name } = req.body;
-    error = errors.errorHandler(username, password);
+    error = errors.errorHandler(username, password, name);
     if (error.length > 0) {
       return res.status(401).json({ error });
     }

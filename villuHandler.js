@@ -90,7 +90,7 @@ function postBooksError(gogn) {
  * @param {any} username
  * @param {any} password
  */
-function errorHandler(username, password) {
+function errorHandler(username, password,name) {
   const fylki = [];
   if (password.length < 6) {
     const error = {
@@ -101,6 +101,12 @@ function errorHandler(username, password) {
   if (username.length < 3) {
     const error = {
       error: 'Username must be 3 characters of length minimum',
+    };
+    fylki.push(error);
+  }
+  if (name.length < 0) {
+    const error = {
+      error: 'Name must not be empty',
     };
     fylki.push(error);
   }
