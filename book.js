@@ -6,10 +6,10 @@ const xss = require('xss');
 async function query(q, values = []) {
     // const client = new Client({ connectionString });
     const client = new Client({
-      password: 'Pluto050196',
         user: 'postgres',
         host: 'localhost',
         database: 'library',
+        password: 'Pluto050196',
     });
     await client.connect();
     let result;
