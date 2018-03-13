@@ -5,13 +5,13 @@
 * copy books (title, author, description, isbn10, isbn13, published, pagecount, language, category) FROM 'C:\\Users\\Sixsmith\\Desktop\\Vef2-hop\\data\\books.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' ESCAPE '''';
 * GOD HELP YOU IF YOU LOSE THESE COMMANDS.
 */
-/* ++++++++++ Fyrsta taflan users lï¿½ï¿½sing ++++++++++
+/* ++++++++++ Fyrsta taflan users lysing ++++++++++
  * Notendur
  * Auï¿½kenni, primary key
  * Notendanafn, einstakt gildi, a.m.k. 3 stafir, krafist
- * Lykilorï¿½s hash, lykilorï¿½ verï¿½ur aï¿½ vera a.m.k. 6 stafir, krafist
- * Nafn, ekki tï¿½mi strengurinn, krafist
- *Slï¿½ï¿½ ï¿½ mynd, ekki krafist
+ * Lykilord hash, lykilord verdur ad vera a.m.k. 6 stafir, krafist
+ * Nafn, ekki timi strengurinn, krafist
+ * mynd, ekki krafist
 */
 create table users(
  id serial primary key,
@@ -24,10 +24,10 @@ create table users(
 );
 
 
-/* ++++++++++ 2 taflan lï¿½ï¿½sing ++++++++++
+/* ++++++++++ 2 taflan lysing ++++++++++
  * Flokkar
- * Auï¿½kenni, primary key
- * Heiti, einstakt gildi, ekki tï¿½mi strengurinn, krafist
+ * Audkenni, primary key
+ * Heiti, einstakt gildi, ekki timi strengurinn, krafist
 */
 create table categories(
 id serial primary key,
@@ -35,7 +35,7 @@ categories_name varchar(99) NOT NULL CHECK (categories_name <> ''),
 UNIQUE(categories_name)
 );
 /*
- * Inser skipanir fyrir töfluna categories
+ * Insert skipanir fyrir töfluna categories
 */
 insert into categories(categories_name) Values('Fiction');
 insert into categories(categories_name) Values('Nonfiction');
@@ -51,18 +51,16 @@ insert into categories(categories_name) Values('Business');
 insert into categories(categories_name) Values('Computer Science');
 
 
-/* ++++++++++ 3 tafla lï¿½ï¿½sing ++++++++++
- * Bï¿½kur
- * Auï¿½kenni, primary key
- * Titill, einstakt gildi, ekki tï¿½mi strengurinn, krafist
- * ISBN13, einstakt gildi, nï¿½kvï¿½mlega 13 stafa strengur gerï¿½ur ï¿½r tï¿½lum, krafist
- * Hï¿½fundur, ekki krafist
- * Lï¿½sing, lengri texti, ekki krafist
- * Flokkur, foreign key ï¿½ flokka tï¿½flu, krafist
- * ISBN10, strengur, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
- * ï¿½tgï¿½fudagsetning, ekki krafist, strengur, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
- * Sï¿½ï¿½ufjï¿½ldi, tala, stï¿½rri en 0, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
- * Tungumï¿½l, 2 stafa strengur, ekki krafist, ekki krafa aï¿½ hafa meï¿½ ï¿½ verkefni
+/* ++++++++++ 3 tafla lysing ++++++++++
+ * Baekur
+ * Audkenni, primary key
+ * Titill, einstakt gildi, ekki timi strengurinn, krafist
+ * ISBN13, einstakt gildi, nakvaemlega 13 stafa strengur, krafist
+ * Hofundur, ekki krafist
+ * Lysing, lengri texti, ekki krafist
+ * Flokkur, foreign key i flokka toflu, krafist
+ * ISBN10, strengur, ekki krafist,
+ * utgafudagsetning, ekki krafist, strengur
 */
 
 create table books(
@@ -81,13 +79,13 @@ UNIQUE(isbn13),
 FOREIGN KEY(category) REFERENCES categories(categories_name)
 );
 
-/* ++++++++++ 4 tafla lï¿½ï¿½sing  ++++++++++
- * Lesnar bï¿½kur notenda
- * Auï¿½kenni
- * Auï¿½kenni notanda, foreign key ï¿½ notanda tï¿½flu, krafist
- * Auï¿½kenni bï¿½kar, foreign key ï¿½ bï¿½ka tï¿½flu, krafist
- * Einkunn notanda, gildi ï¿½r eftirfarandi lista 1, 2, 3, 4, 5 ï¿½ar sem 1 er lï¿½gsta einkunn og 5 hï¿½sta, krafist
- * Dï¿½mur notanda, lengri texti, ekki krafist
+/* ++++++++++ 4 tafla lysing  ++++++++++
+ * Lesnar baekur notenda
+ * Audkenni
+ * Audkenni notanda, foreign key i notanda toflu, krafist
+ * Audkenni bokar, foreign key i boka toflu, krafist
+ * Einkunn notanda, gildir i eftirfarandi lista 1, 2, 3, 4, 5 ï¿½ar sem 1 er laegsta einkunn og 5 haesta, krafist
+ * Domur notanda, lengri texti, ekki krafist
 */
 create table booksread(
 id serial,
