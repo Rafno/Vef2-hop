@@ -92,35 +92,35 @@ function errorHandler(username, password) {
 }
 function testBookTemplate(data) {
   const fylki = [];
-  if (!(data.hasOwnProperty('title'))) {
+  if (!(Object.prototype.hasOwnProperty.call(data, 'title'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('author'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'author'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('description'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'description'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('isbn10'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'isbn10'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('isbn13'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'isbn13'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('published'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'published'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('language'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'language'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
-  } else if (!(data.hasOwnProperty('category'))) {
+  } else if (!(Object.prototype.hasOwnProperty.call(data, 'category'))) {
     fylki.push({
       Error: 'Incorrect format',
     });
