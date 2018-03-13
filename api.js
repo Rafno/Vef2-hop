@@ -176,7 +176,7 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
   let error = [];
   const { username, password, name } = req.body;
 
-  error = errors.errorHandler(username, password);
+  error = errors.errorHandler(username, password, name);
   if (error.length > 0) {
     return res.status(401).json({ error });
   }
@@ -289,7 +289,7 @@ router.get(
       leita = await book.searchBooks(search, limit, offset);
     } else {
       const data = await book.getBooks(limit, offset);
-      const response = limiter(data, limit, offset, search);
+      const response = limiter(data, limit, offset, 'books');
       res.status(200).json(response);
       return;
     }
@@ -300,7 +300,7 @@ router.get(
       };
       res.status(400).json({ villa });
     } else {
-      const response = limiter(leita, limit, offset, `books?search${search}`);
+      const response = limiter(leita, limit, offset, `books?search=${search}`);
       res.status(200).json({ response });
     }
   },

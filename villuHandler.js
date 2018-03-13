@@ -63,7 +63,7 @@ function postBooksError(gogn) {
   if (typeof (gogn.pagecount) !== 'number' || gogn.pagecount < 0) {
     const answ6 = {
       field: 'Pagecount',
-      Error: ' Pagecount can only include Integer and it can not be a number under cero. ',
+      Error: ' Pagecount can only include Integer and it can not be a number under zero. ',
     };
     fylki.push(answ6);
   }
@@ -90,7 +90,7 @@ function postBooksError(gogn) {
  * @param {any} username
  * @param {any} password
  */
-function errorHandler(username, password,name) {
+function errorHandler(username, password, name) {
   const fylki = [];
   if (password.length < 6) {
     const error = {
@@ -104,7 +104,7 @@ function errorHandler(username, password,name) {
     };
     fylki.push(error);
   }
-  if (name.length < 0) {
+  if (name.length === 0) {
     const error = {
       error: 'Name must not be empty',
     };
