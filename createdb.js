@@ -7,7 +7,7 @@ const { Client } = require('pg');
 
 const csvFilePath = '.\data\books.csv';
 
-let csvFile = {
+const csvFile = {
   "books": [
     {
       "title": title,
@@ -25,7 +25,6 @@ let csvFile = {
 csv()
   .fromFile(csvFilePath)
   .on('json', (jsonObj) => {
-
     // combine csv header row and csv line to a json object
     // jsonObj.a ==> 1 or 4
   })
