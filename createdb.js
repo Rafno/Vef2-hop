@@ -25,7 +25,7 @@ let csvFile = {
 csv()
   .fromFile(csvFilePath)
   .on('json', (jsonObj) => {
-    
+
     // combine csv header row and csv line to a json object
     // jsonObj.a ==> 1 or 4
   })

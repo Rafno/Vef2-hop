@@ -29,7 +29,7 @@ async function upload(req, res, next) {
   if (!path) {
     return res.send('gat ekki lesið mynd');
   }
-  
+
 
 
   let upload = null;
@@ -42,11 +42,11 @@ async function upload(req, res, next) {
   }
 
   const { secure_url } = upload;
-    const updated = await users.editPic(req.user.id, secure_url);
+  const updated = await users.editPic(req.user.id, secure_url);
   res.status(200).json({ Success: 'Your account has been modified', secure_url });
 }
 app.post('/upload', uploads.single('image'), upload);
 
 module.exports = {
-    upload,
+  upload,
 }

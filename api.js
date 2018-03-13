@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const express = require('express');
-const router = express.Router();
 const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const jwt = require('jsonwebtoken');
@@ -9,12 +8,11 @@ const users = require('./users');
 const book = require('./book');
 const cloud = require('./cloudinary');
 const multer = require('multer');
-const uploads = multer({ dest: './temp' });
 const errors = require('./villuHandler');
-const app = require('./app');
+
+const router = express.Router();
+const uploads = multer({ dest: './temp' });
 router.use(express.json());
-
-
 
 const {
   PORT: port = 3000,
@@ -29,7 +27,7 @@ if (!jwtSecret) {
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: jwtSecret,
-}
+};
 
 async function strat(data, next) {
   const user = await users.findById(data.id);
@@ -42,22 +40,22 @@ async function strat(data, next) {
 // Föll sem er hægt að kalla á í users.js
 function limiter(data, limit, offset, type) {
   const result = {
-    _links: {
+    links: {
       self: {
-        href: `http://localhost:${port}/${type}?offset=${offset}&limit=${limit}`
-      }
+        href: `http://localhost:${port}/${type}?offset=${offset}&limit=${limit}`,
+      },
     },
-    items: data
+    items: data,
   };
   if (offset > 0) {
-    result._links['prev'] = {
-      href: `http://localhost:${port}/${type}?offset=${offset - limit}&limit=${limit}`
-    }
+    result.links.prev = {
+      href: `http://localhost:${port}/${type}?offset=${offset - limit}&limit=${limit}`,
+    };
   }
   if (data.length >= limit) {
-    result._links['next'] = {
-      href: `http://localhost:${port}/${type}?offset=${Number(offset) + limit}&limit=${limit}`
-    }
+    result.links.next = {
+      href: `http://localhost:${port}/${type}?offset=${Number(offset) + limit}&limit=${limit}`,
+    };
   }
   return result;
 }
@@ -65,19 +63,20 @@ function requireAuthentication(req, res, next) {
   return passport.authenticate(
     'jwt',
     { session: false },
+    // Eslint disable á fall sem Óli gefur.
+    /* eslint-disable */
     (err, user, info) => {
       if (err) {
         return next(err);
       }
-
       if (!user) {
         const error = info.name === 'TokenExpiredError' ? 'expired token' : 'invalid token';
         return res.status(401).json({ error });
       }
-
       req.user = user;
       next();
-    }
+      /* eslint-enable */
+    },
   )(req, res, next);
 }
 
@@ -95,9 +94,10 @@ router.post(
     if (user) {
       return res.status(401).json({ error: 'User already exists' });
     }
-    const registeredUser = await users.createUser(username, password, name);
-    return res.status(201).json({ Success: username + ' has been created' });
-  });
+    await users.createUser(username, password, name);
+    return res.status(201).json({ Success: `${username} has been created` });
+  },
+);
 router.post(
   '/login',
   async (req, res) => {
@@ -117,11 +117,13 @@ router.post(
       return res.json({ token });
     }
     return res.status(401).json({ error: 'Invalid password' });
-  });
+  },
+);
 
 // GET skilar stökum notanda ef til
 // Lykilorðs hash skal ekki vera sýnilegt
-router.get('/users',
+router.get(
+  '/users',
   requireAuthentication, async (req, res) => {
     let { offset = 0, limit = 10 } = req.query;
     offset = Number(offset);
@@ -129,7 +131,8 @@ router.get('/users',
     const data = await users.findAll(limit, offset);
     const response = limiter(data, limit, offset, 'users');
     return res.status(200).json({ response });
-  });
+  },
+);
 
 // GET skilar stökum notanda ef til
 // Lykilorðs hash skal ekki vera sýnilegt
@@ -138,7 +141,7 @@ router.get('/users/me', requireAuthentication, async (req, res) => {
   return res.status(200).json({ identity: id, username, name });
 });
 router.patch('/users/me', requireAuthentication, async (req, res) => {
-  // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn, þ.e.a.s. nafn eða lykilorð, ef þau eru gild
+  // PATCH uppfærir sendar upplýsingar um notanda fyrir utan notendanafn
   let error = [];
   const { username, password, name } = req.body;
 
@@ -147,31 +150,32 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
     return res.status(400).json({ error });
   }
   await users.editUser(req.user.id, username, password, name);
-  return res.status(200).json({ Success: 'Your account has been modified', username, password, name });
+  return res.status(200).json({
+    Success: 'Your account has been modified', username, password, name,
+  });
 });
-router.post('/users/me/profile', requireAuthentication, uploads.single('profile'), cloud.upload, async (req, res) => {
-  // POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
-});
+router.post('/users/me/profile', requireAuthentication, uploads.single('profile'), cloud.upload);
+// POST setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
 router.get('/users/me/read', requireAuthentication, async (req, res) => {
-  // GET skilar síðu af lesnum bókum innskráðs notanda
+// GET skilar síðu af lesnum bókum innskráðs notanda
   let { offset = 0, limit = 10 } = req.query;
   offset = Number(offset);
   limit = Number(limit);
-  const my_books = await users.readBooks(req.user.id, limit, offset);
-  if (my_books === null) {
+  const myBooks = await users.readBooks(req.user.id, limit, offset);
+  if (myBooks === null) {
     return res.status(401).json({ Empty: 'You have not read any books' });
   }
-  const response = limiter(my_books, limit, offset, '/users/me/read');
+  const response = limiter(myBooks, limit, offset, '/users/me/read');
   return res.status(200).json({ response });
 });
 router.post('/users/me/read', requireAuthentication, async (req, res) => {
   // POST býr til nýjan lestur á bók og skilar, grade, id, title, text
-  const { booksread_title, booksread_grade, booksread_judge } = req.body;
-  const bookTitle = await users.findBookByTitle(booksread_title);
+  const { title, grade, judge } = req.body;
+  const bookTitle = await users.findBookByTitle(title);
   if (!(bookTitle)) {
     return res.status(400).json({ Error: 'book does not exist' });
   }
-  const books = await users.addReadBook(req.user.id, booksread_title, booksread_grade, booksread_judge);
+  const books = await users.addReadBook(req.user.id, title, grade, judge);
   return res.status(200).json({ books });
 });
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
@@ -190,13 +194,11 @@ router.get('/users/:id/read', requireAuthentication, async (req, res) => {
   if (user) {
     const userID = await users.readBooks(user.id);
     if (userID) {
-      const response = limiter(userID, limit, offset, 'users/' + req.params.id + '/read');
+      const response = limiter(userID, limit, offset, `users/${req.params.id}/read`);
       return res.status(200).json({ response });
-
     }
   }
   return res.status(400).json({ Empty: 'This user does not exist or has not read any books' });
-
 });
 router.get('/users/:id', requireAuthentication, async (req, res) => {
   const user = await users.findById(req.params.id);
@@ -215,7 +217,8 @@ router.get(
     const data = await book.getCategories(limit, offset);
     const response = limiter(data, limit, offset, 'categories');
     res.status(200).json({ response });
-  });
+  },
+);
 
 // POST býr til nýjan flokk
 router.post(
@@ -233,10 +236,10 @@ router.post(
       }
     } else {
       res.status(400).json({
-        categories_name: ' Sorry the name of the categories must be a string'
+        categories_name: ' Sorry the name of the categories must be a string',
       });
     }
-  }
+  },
 );
 // GET skilar síðu af bókum
 router.get(
@@ -257,24 +260,24 @@ router.get(
     }
     if (Object.keys(leita).length === 0) {
       const villa = {
-        field: ' Error',
-        Error: " Sorry but your search for '" + search + "' returned nothing",
-      }
+        field: 'Error',
+        Error: `Sorry but your search for '${search}' returned nothing`,
+      };
       res.status(400).json({ villa });
     } else {
       const response = limiter(leita, limit, offset);
       res.status(200).json({ response });
     }
-
-  });
+  },
+);
 
 // POST býr til nýja bók ef hún er gild og skilar
 router.post(
   '/books', requireAuthentication,
   async (req, res) => {
-    let fylki = []
+    let fylki = [];
     const data = req.body;
-    if (errors.testBookTemplate(data).length != 0) {
+    if (errors.testBookTemplate(data).length !== 0) {
       fylki = errors.testBookTemplate(data);
       res.status(400).json({ fylki });
       return;
@@ -282,7 +285,7 @@ router.post(
     let errarray = [];
     errarray = errors.postBooksError(data);
     if (errarray.length === 0) {
-      const gogn = await book.postBooks(res, {
+      await book.postBooks(res, {
         title: data.title,
         author: data.author,
         description: data.description,
@@ -297,7 +300,8 @@ router.post(
     } else {
       res.status(400).json({ errarray });
     }
-  });
+  },
+);
 router.get(
   '/books/:id', requireAuthentication,
   async (req, res) => {
@@ -309,10 +313,10 @@ router.get(
       const err = {
         field: 'ID',
         Error: ' ID must be a integer',
-      }
+      };
       res.status(400).json({ err });
     }
-  }
+  },
 );
 
 router.patch(
@@ -323,8 +327,8 @@ router.patch(
     let errarray = [];
     errarray = errors.postBooksError(data);
     if (errarray.length === 0) {
-      const gogn = await book.patchBooksById(res, {
-        id: id,
+      await book.patchBooksById(res, {
+        id,
         title: data.title,
         author: data.author,
         description: data.description,
@@ -339,7 +343,7 @@ router.patch(
     } else {
       res.status(400).json({ errarray });
     }
-  }
+  },
 );
 
 passport.use(new Strategy(jwtOptions, strat));
