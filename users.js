@@ -91,7 +91,6 @@ async function editUser(id, username, password, name) {
 }
 async function editPic(id, urlPic) {
   const q = 'UPDATE users SET urlpic = $1 WHERE id = $2;';
-  console.log(id, urlPic);
   const result = await query(q, [urlPic, id]);
   return result.rows[0];
 }
@@ -108,23 +107,22 @@ async function readBooks(id, limit, offset) {
   return result.rows;
 }
 
-async function addReadBook(book_id, title, grade, judge) {
+async function addReadBook(bookId, title, grade, judge) {
   const q = 'INSERT INTO booksread(booksread_id, booksread_title, booksread_grade, booksread_judge) VALUES($1,$2,$3,$4) RETURNING * ';
-  const result = await query(q, [book_id, title, grade, judge]);
+  const result = await query(q, [bookId, title, grade, judge]);
   return result.rows[0];
 }
-async function deleteReadBook(book_id) {
+async function deleteReadBook(bookId) {
   let q = 'SELECT id FROM booksread WHERE id = $1';
-  let result = await query(q, [book_id]);
+  let result = await query(q, [bookId]);
   if (result.rowCount === 0) {
     return null;
   }
   q = 'DELETE from booksread WHERE id = $1';
-  result = await query(q, [book_id]);
+  result = await query(q, [bookId]);
   return result.rows;
 }
 async function findBookByTitle(title) {
-
   const q = 'SELECT title from books WHERE title = $1';
   const result = await query(q, [title]);
 
@@ -145,4 +143,4 @@ module.exports = {
   deleteReadBook,
   findBookByTitle,
   editPic,
-}
+};

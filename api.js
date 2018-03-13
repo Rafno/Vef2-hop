@@ -251,7 +251,7 @@ router.get(
       leita = await book.searchBooks(search, limit, offset);
     } else {
       const data = await book.getBooks(limit, offset);
-      const response = limiter(data, limit, offset, 'books');
+      const response = limiter(data, limit, offset, search);
       res.status(200).json(response);
       return;
     }
@@ -259,7 +259,7 @@ router.get(
       const villa = {
         field: ' Error',
         Error: " Sorry but your search for '" + search + "' returned nothing",
-      }
+      };
       res.status(400).json({ villa });
     } else {
       const response = limiter(leita, limit, offset);

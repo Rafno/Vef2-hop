@@ -2,12 +2,11 @@ require('dotenv').config();
 const cloudinary = require('cloudinary');
 const express = require('express');
 const multer = require('multer');
+
 const uploads = multer({ dest: './temp' });
 const users = require('./users');
 
 const {
-  PORT: port = 3000,
-  HOST: host = '127.0.0.1',
   CLOUDINARY_CLOUD,
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
@@ -29,7 +28,8 @@ async function upload(req, res, next) {
   if (!path) {
     return res.send('gat ekki lesið mynd');
   }
-  let upload = null;
+  // Þessi lína er disabled af því að hún er tekin frá óla kennnara.
+  let upload = null; // eslint-disable-line
 
   try {
     upload = await cloudinary.v2.uploader.upload(path);
@@ -38,12 +38,12 @@ async function upload(req, res, next) {
     return next(error);
   }
 
-  const { secure_url } = upload;
-    const updated = await users.editPic(req.user.id, secure_url);
-  res.status(200).json({ Success: 'Your account has been modified', secure_url });
+  const { url } = upload;
+  await users.editPic(req.user.id, url);
+  return res.status(200).json({ Success: 'Your account has been modified', url });
 }
 app.post('/upload', uploads.single('image'), upload);
 
 module.exports = {
-    upload,
-}
+  upload,
+};
