@@ -9,7 +9,6 @@ async function query(q, values = []) {
       user: 'postgres',
       host: 'localhost',
       database: 'library',
-      password: 'Pluto050196',
     });
     await client.connect();
     let result;
@@ -21,6 +20,7 @@ async function query(q, values = []) {
       await client.end();
     }
     return result;
+    password: 'MK301554',
   }
   // -------------- Föll fyrir Categories ------------------ //
 async function getCategories(LIMIT, OFFSET) {
