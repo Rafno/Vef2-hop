@@ -29,9 +29,6 @@ async function upload(req, res, next) {
   if (!path) {
     return res.send('gat ekki lesið mynd');
   }
-  
-
-
   let upload = null;
 
   try {
