@@ -159,7 +159,7 @@ async function getBooksById(id, res) {
 }
 async function searchBooks(search = '', LIMIT, OFFSET) {
   try {
-    let q = `
+    const q = `
         SELECT id, title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books
         WHERE
           to_tsvector('english', title) @@ to_tsquery('english', $1)
@@ -171,6 +171,7 @@ async function searchBooks(search = '', LIMIT, OFFSET) {
   } catch (e) {
     console.error('Error selecting', e);
   }
+  return null;
 }
 
 module.exports = {
