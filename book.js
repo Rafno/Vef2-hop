@@ -42,6 +42,7 @@ async function getCategories(LIMIT, OFFSET) {
  * Bætir við nýjum category, sem fremur að það category hefur ekki nú þegar komið fyrir
  * Ath. skoðar ekki hástafi/lástafi. Science-fiction, science-Fiction og aðrar útgáfur af
  * þessu nafni geta verið til í sömu töflu.
+ * Hér má einnig sjá eina skiptið sem við notum xss
  * @param {String} categoriesName
  */
 async function postCategories({ categoriesName } = {}) {
