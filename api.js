@@ -88,7 +88,7 @@ router.post(
     const { username, password, name } = req.body;
     error = errors.errorHandler(username, password);
     if (error.length > 0) {
-      return res.status(400).json({ error });
+      return res.status(401).json({ error });
     }
     const user = await users.findByUsername(username);
     if (user) {
@@ -147,7 +147,7 @@ router.patch('/users/me', requireAuthentication, async (req, res) => {
 
   error = errors.errorHandler(username, password);
   if (error.length > 0) {
-    return res.status(400).json({ error });
+    return res.status(401).json({ error });
   }
   await users.editUser(req.user.id, username, password, name);
   return res.status(200).json({

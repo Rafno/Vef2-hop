@@ -15,7 +15,7 @@ async function query(q, values = []) {
     user: 'postgres',
     host: 'localhost',
     database: 'library',
-    password: 'MK301554',
+    password: 'Pluto050196',
   });
   await client.connect();
 
@@ -83,7 +83,7 @@ async function editUser(id, username, password, name) {
     return null;
   }
   const hashedPassword = await bcrypt.hash(password, 11);
-  const q = 'UPDATE users SET username = $1, password = $2, name = $3 WHERE id = $5;';
+  const q = 'UPDATE users SET username = $1, password = $2, name = $3 WHERE id = $4;';
   const result = await query(q, [username, hashedPassword, name, id]);
   return result.rows[0];
 }
