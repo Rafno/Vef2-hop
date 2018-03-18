@@ -57,19 +57,19 @@ function limiter(data, limit, offset, type) {
   const result = {
     links: {
       self: {
-        href: `http://localhost:${port}/${type}?offset=${offset}&limit=${limit}`,
+        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}&${type}`,
       },
     },
     items: data,
   };
   if (offset > 0) {
     result.links.prev = {
-      href: `http://localhost:${port}/${type}?offset=${offset - limit}&limit=${limit}`,
+      href: `http://localhost:${port}/books?offset=${offset - limit}&limit=${limit}&${type}`,
     };
   }
   if (data.length >= limit) {
     result.links.next = {
-      href: `http://localhost:${port}/${type}?offset=${Number(offset) + limit}&limit=${limit}`,
+      href: `http://localhost:${port}/books?offset=${Number(offset) + limit}&limit=${limit}&${type}`,
     };
   }
   return result;
@@ -243,7 +243,7 @@ router.get('/users/:id', requireAuthentication, async (req, res) => {
 });
 // GET skilar síðu af flokkum
 router.get(
-  '/categories', requireAuthentication,
+  '/categories',
   async (req, res) => {
     let { offset = 0, limit = 10 } = req.query;
     offset = Number(offset);
@@ -299,7 +299,7 @@ router.get(
       };
       res.status(400).json({ villa });
     } else {
-      const response = limiter(leita, limit, offset, `books?search=${search}`);
+      const response = limiter(leita, limit, offset, `search=${search}`);
       res.status(200).json({ response });
     }
   },
@@ -337,7 +337,7 @@ router.post(
 );
 // GET nær í upplýsingar um bók og skilar.
 router.get(
-  '/books/:id', requireAuthentication,
+  '/books/:id',
   async (req, res) => {
     const { id } = req.params;
     if (typeof (id) === 'string') {
