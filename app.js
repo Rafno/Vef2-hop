@@ -18,7 +18,9 @@ app.use('/', api);
 const {
   PORT: port = 3000,
 } = process.env;
-
+/* Þessir Handlerar eru teknir beint frá óla og þeir virka aðeins
+ *með því að hafa next en eslint kvartar yfir því.Svo við ákváðum að disable þá.
+ */
 function notFoundHandler(req, res, next) { // eslint-disable-line
   res.status(404).json({ error: 'Not found' });
 }

@@ -206,7 +206,7 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
   if (!(bookTitle)) {
     return res.status(400).json({ Error: 'book does not exist' });
   }
-  if (grade > 5 || grade < 0 || typeof grade !== number) {
+  if (grade > 5 || grade < 1 || typeof grade !== 'number') {
     return res.status(400).json({ Error: 'Grade incorrect format, grade must be an integer and between 0 and 5' });
   }
   const books = await users.addReadBook(req.user.id, title, grade, judge);
