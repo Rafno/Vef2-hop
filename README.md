@@ -20,35 +20,62 @@ Flæði væri:
 5. `url` úr svari er vistað í notenda töflu
 
 ## Gögn
-
-Útbúa þarf töflur fyrir eftirfarandi gögn, gefnar eru kröfur á gögnum sem passa þarf upp á þegar nýjar færslur eru gerðar eða eldri uppfærðar.
-
+Hér má sjá SQL töflurnar okkar. Einnig kommentað og með insert skipunum í schema.sql skjalinu.
 * Notendur
-  - Auðkenni, _primary key_
-  - Notendanafn, _einstakt gildi_, a.m.k. 3 stafir, krafist
-  - Lykilorðs hash, lykilorð verður að vera a.m.k. 6 stafir, krafist
-  - Nafn, ekki tómi strengurinn, krafist
-  - Slóð á mynd, ekki krafist
+```
+create table users(
+ id serial primary key,
+ username TEXT CHECK (LENGTH(username) > 2) NOT NULL,
+ password TEXT CHECK (LENGTH(password) > 5) NOT NULL,
+ name varchar (99) NOT NULL,
+ urlpic varchar(255),
+ UNIQUE( username),
+ UNIQUE( password)
+);
+```
 * Flokkar
-  - Auðkenni, _primary key_
-  - Heiti, _einstakt gildi_, ekki tómi strengurinn, krafist
+```
+create table categories(
+id serial primary key,
+categoriesname varchar(99) NOT NULL CHECK (categoriesname <> ''),
+UNIQUE(categoriesname)
+);
+```
 * Bækur
-  - Auðkenni, _primary key_
-  - Titill, _einstakt gildi_, ekki tómi strengurinn, krafist
-  - ISBN13, _einstakt gildi_, nákvæmlega 13 stafa strengur gerður úr tölum, krafist
-  - Höfundur, ekki krafist
-  - Lýsing, lengri texti, ekki krafist
-  - Flokkur, _foreign key_ í flokka töflu, krafist
-  - ISBN10, strengur, ekki krafist, ekki krafa að hafa með í verkefni
-  - Útgáfudagsetning, ekki krafist, strengur, ekki krafa að hafa með í verkefni
-  - Síðufjöldi, tala, stærri en 0, ekki krafist, ekki krafa að hafa með í verkefni
-  - Tungumál, 2 stafa strengur, ekki krafist, ekki krafa að hafa með í verkefni
+```
+create table books(
+id serial primary key,
+title varchar(999) NOT NULL CHECK (title <> ''),
+author varchar(99),
+description TEXT,
+isbn10 varchar(99),
+isbn13 char(13) NOT NULL,
+published varchar(99),
+pagecount varchar(99),
+language char(2),
+category varchar(99) NOT NULL,
+UNIQUE(title),
+UNIQUE(isbn13),
+FOREIGN KEY(category) REFERENCES categories(categoriesname)
+);
+```
+
 * Lesnar bækur notenda
-  - Auðkenni
-  - Auðkenni notanda, _foreign key_ í notanda töflu, krafist
-  - Auðkenni bókar, _foreign key_ í bóka töflu, krafist
-  - Einkunn notanda, gildi úr eftirfarandi lista `1, 2, 3, 4, 5` þar sem `1` er lægsta einkunn og `5` hæsta, krafist
-  - Dómur notanda, lengri texti, ekki krafist
+```
+create table booksread(
+id serial,
+booksread_id integer NOT NULL,
+booksread_title varchar(99) NOT NULL,
+booksread_grade INT CHECK (booksread_grade >0 AND booksread_grade < 6) NOT NULL,
+booksread_judge TEXT,
+FOREIGN KEY (booksread_id) REFERENCES users (id),
+FOREIGN KEy (booksread_title) REFERENCES books (title)
+);
+```
+* Bækur teknar inn með postgresql skipun, sem má sjá hér  
+``` copy books (title, author, description, isbn10, isbn13, published, pagecount, language, category) FROM 'C:\\Users\\myComputer\\Desktop\\Vef2-hop\\data\\books.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8' ESCAPE ''''; ```
+  
+Skipunin virkar svo að hún tekur við csv skjali og setur í útbúna töflu, delimiter sýnir hvar á að fara í næsta gildi, encoding gefur íslenska stafi ef notaðir, header kemur í veg fyrir að fyrsta línan er notuð og escape sýnir að ef '' er í streng skal hunsa semi-kommur inn í því.  
 
 Þar sem merkt er _krafist_ verða gögn að innihalda gildi og þau að vera gild skv. lýsingu. Þar sem merkt er _ekki krafst_ má sleppa gildi í gögnum, bæði þegar eining er búin til og henni skilað.
 
