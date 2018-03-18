@@ -60,6 +60,7 @@ Gögn eru gefin innan `data/` möppu þar sem `books.csv` inniheldur 532 færslu
 ## Vefþjónustur
 
 Eftirfarandi slóðir eiga að vera til staðar, öll gögn sem send eru inn skulu vera á `JSON` formi og gögnum skilað á `JSON` formi.
+Token endist í 100000 mínútur upp á þægindi. Stóð engin krafa um lengdartíma í verkefninu.
 ## Notendalýsing á vefþjónustum
 * `/register`
   - Fara á /Register í POST stillingu, skal skrifa í Body ```{"username":"Foo", "password":"Bar","name":"FooBar"}```(Lágstafur skiptir máli)
