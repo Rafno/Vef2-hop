@@ -262,18 +262,18 @@ router.post(
   '/categories', requireAuthentication,
   async (req, res) => {
     const data = req.body;
-    if (errors.postCategoriesError(data.categoriesName) === true) {
+    if (errors.postCategoriesError(data.categoriesname) === true) {
       const gogn = await book.postCategories({
-        categoriesName: data.categoriesName,
+        categoriesname: data.categoriesname,
       });
       if (gogn !== null) {
         res.status(201).json({ data });
       } else {
-        res.status(400).json({ categoriesName: " This name is not valid because it's already in the table" });
+        res.status(400).json({ categoriesname: " This name is not valid because it's already in the table" });
       }
     } else {
       res.status(400).json({
-        categoriesName: ' Sorry the name of the categories must be a string',
+        categoriesname: ' Sorry the name of the categories must be a string',
       });
     }
   },
