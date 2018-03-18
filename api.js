@@ -259,7 +259,6 @@ router.post(
   '/categories', requireAuthentication,
   async (req, res) => {
     const data = req.body;
-    console.log(data.categoriesName)
     if (errors.postCategoriesError(data.categoriesName) === true) {
       const gogn = await book.postCategories({
         categoriesName: data.categoriesName,

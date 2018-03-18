@@ -10,7 +10,7 @@ const connectionString = process.env.DATABASE_URL || 'library://:@localhost/post
  * @param {Object} values
  */
 async function query(q, values = []) {
-  //const client = new Client({ connectionString });
+  // const client = new Client({ connectionString });
   const client = new Client({
     user: 'postgres',
     host: 'localhost',
