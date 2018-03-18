@@ -1,7 +1,8 @@
 # Hópverkefni 1
-# Ekki gleyma, síðasta sem á að gera er að endurskrifa README eftir README kröfum.
-Útfæra skal vefþjónustu fyrir „bókasafn“ með notendaumsjón. Gefin eru gögn fyrir bækur og flokka.
 
+## Hópmeðlimir
+Rafnar Ólafsson - Rao13@hi.is
+Helgi Grétar Gunnarsson - Hgg26@hi.is
 ## Notendaumsjón
 
 Hægt á að vera að skrá notendur með nafni, notendanafni og lykilorði. Auðkenning skal fara fram með JWT og passport, token er úthlutað þegar `POST`að er á `/login`.
@@ -59,38 +60,44 @@ Gögn eru gefin innan `data/` möppu þar sem `books.csv` inniheldur 532 færslu
 ## Vefþjónustur
 
 Eftirfarandi slóðir eiga að vera til staðar, öll gögn sem send eru inn skulu vera á `JSON` formi og gögnum skilað á `JSON` formi.
-
+## Notendalýsing á vefþjónustum
 * `/register`
-  - `POST` býr til notanda og skilar án lykilorðs hash
+  - Fara á /Register í POST stillingu, skal skrifa í Body ```{"username":"Foo", "password":"Bar","name":"FooBar"}```(Lágstafur skiptir máli)
 * `/login`
-  - `POST` með notendanafni og lykilorði skilar token
+  - Fara á /login í `POST` stillingu, skal skrifa í Body ```{"username":"Foo", "password":"Bar","name":"FooBar"}```
+Skilað er TOKEN sem þarf að vista og setja í Bearer Token, sem má finna í Autherization flipanum í Postman.
 * `/users`
   - `GET` skilar _síðu_ (sjá að neðan) af notendum
-  - Lykilorðs hash skal ekki vera sýnilegt
+  - Fara á /users í GET stillingu, ekkert þarf í Body.
 * `/users/:id`
   - `GET` skilar stökum notanda ef til
   - Lykilorðs hash skal ekki vera sýnilegt
 * `/users/me`
   - `GET` skilar innskráðum notanda (þ.e.a.s. _þér_)
   - `PATCH` uppfærir sendar upplýsingar um notanda fyrir utan notendanafn, þ.e.a.s. nafn eða lykilorð, ef þau eru gild
+  Fara á /users/me í PATCH stillingu, skal skrifa í Body ```{"username":"Foo", "password":"Bar","name":"FooBar"}```
 * `/users/me/profile`
   - `POST` setur eða uppfærir mynd fyrir notanda í gegnum Cloudinary og skilar slóð
+  - Fara á /users/me/ í `POST` stillingu, í body þarf að velja form-data, key þarf að heita 'Profile', þá má hlaða inn mynd. 
 * `/categories`
   - `GET` skilar _síðu_ af flokkum
-  - `POST` býr til nýjan flokk og skilar
+  - Til að búa til nýjan category, fara á /categories í `POST` stillingu, skal skrifa í Body ```{"categoriesname":"Foo"}```
 * `/books`
   - `GET` skilar _síðu_ af bókum
-  - `POST` býr til nýja bók ef hún er gild og skilar
+  - Til að skrifa nýja bók, þarf að fara á /books í `POST` stillingu, skal skrifa í ```{"title":"foo", "author":"bar", "description":"foobar","isbn10":INTEGER,"isbn13":INTEGER,"published":"fizz","pagecount":INTEGER,"language":"EN","category":"FIZZBUZZ"}```
 * `/books?search=query`
   - `GET` skilar _síðu_ af bókum sem uppfylla leitarskilyrði, sjá að neðan
+  - til að leita, skal fara í /books?search=foobar í `GET` stillingu, þar sem foobar er leitarskilyrði.
 * `/books/:id`
   - `GET` skilar stakri bók
   - `PATCH` uppfærir bók
+  - Til að uppfæra bók, skal nota {"title":"foo", "author":"bar", "description":"foobar","isbn10":INTEGER,"isbn13":INTEGER,"published":"fizz","pagecount":INTEGER,"language":"EN","category":"FIZZBUZZ"}
 * `/users/:id/read`
   - `GET` skilar _síðu_ af lesnum bókum notanda
 * `/users/me/read`
   - `GET` skilar _síðu_ af lesnum bókum innskráðs notanda
   - `POST` býr til nýjan lestur á bók og skilar
+  - Til að skrifa nýjan lestur á bók , skal nota ```{"title":Foo,"grade":INTEGER, "judge":"Foobar"}```
 * `/users/me/read/:id`
   - `DELETE` eyðir lestri bókar fyrir innskráðann notanda
 
@@ -189,3 +196,4 @@ Skilaboð skulu innihalda slóð á GitHub repo fyrir verkefni, slóð á Heroku
 Sett verða fyrir sex minni verkefni þar sem fimm bestu gilda 6% hvert, samtals 30% af lokaeinkunn.
 
 Sett verða fyrir tvö hópa verkefni þar sem hvort um sig gildir 15%, samtals 30% af lokaeinkunn.
+
