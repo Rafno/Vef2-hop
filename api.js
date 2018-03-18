@@ -206,7 +206,7 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
   if (!(bookTitle)) {
     return res.status(400).json({ Error: 'book does not exist' });
   }
-  if (grade > 5 || grade < 0 || typeof grade !== number) {
+  if (grade > 5 || grade < 1 || typeof grade !== 'number') {
     return res.status(400).json({ Error: 'Grade incorrect format, grade must be an integer and between 0 and 5' });
   }
   const books = await users.addReadBook(req.user.id, title, grade, judge);
@@ -262,18 +262,18 @@ router.post(
   '/categories', requireAuthentication,
   async (req, res) => {
     const data = req.body;
-    if (errors.postCategoriesError(data.categoriesName) === true) {
+    if (errors.postCategoriesError(data.categoriesname) === true) {
       const gogn = await book.postCategories({
-        categoriesName: data.categoriesName,
+        categoriesname: data.categoriesname,
       });
       if (gogn !== null) {
         res.status(201).json({ data });
       } else {
-        res.status(400).json({ categoriesName: " This name is not valid because it's already in the table" });
+        res.status(400).json({ categoriesname: " This name is not valid because it's already in the table" });
       }
     } else {
       res.status(400).json({
-        categoriesName: ' Sorry the name of the categories must be a string',
+        categoriesname: ' Sorry the name of the categories must be a string',
       });
     }
   },

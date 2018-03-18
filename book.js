@@ -11,13 +11,7 @@ const connectionString = process.env.DATABASE_URL || 'library://:@localhost/post
  * @param {Object} values
  */
 async function query(q, values = []) {
-  // const client = new Client({ connectionString });
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'library',
-    password: 'Pluto050196',
-  });
+  const client = new Client({ connectionString });
   await client.connect();
   let result;
   try {
@@ -39,7 +33,7 @@ async function query(q, values = []) {
  * @param {int} OFFSET
  */
 async function getCategories(LIMIT, OFFSET) {
-  const q = 'SELECT id,categoriesName FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
+  const q = 'SELECT id,categoriesname FROM categories ORDER BY id LIMIT $1 OFFSET $2 ';
   const gogn = await query(q, [LIMIT, OFFSET]);
   return gogn.rows;
 }
@@ -48,25 +42,19 @@ async function getCategories(LIMIT, OFFSET) {
  * Ath. skoðar ekki hástafi/lástafi. Science-fiction, science-Fiction og aðrar útgáfur af
  * þessu nafni geta verið til í sömu töflu.
  * Hér má einnig sjá eina skiptið sem við notum xss
- * @param {String} categoriesName
+ * @param {String} categoriesname
  */
-async function postCategories({ categoriesName } = {}) {
-  // const client = new Client({ connectionString });
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'library',
-    password: 'Pluto050196',
-  });
+async function postCategories({ categoriesname } = {}) {
+  const client = new Client({ connectionString });
   await client.connect();
-  let gogn = await client.query('SELECT categoriesName FROM categories where categoriesName = $1', [
-    xss(categoriesName),
+  let gogn = await client.query('SELECT categoriesname FROM categories where categoriesname = $1', [
+    xss(categoriesname),
   ]);
   if (gogn.rowCount === 1) {
     return null;
   }
-  gogn = await client.query('INSERT INTO categories (categoriesName) VALUES($1);', [
-    xss(categoriesName),
+  gogn = await client.query('INSERT INTO categories (categoriesname) VALUES($1);', [
+    xss(categoriesname),
   ]);
   await client.end();
   return gogn.rows;
