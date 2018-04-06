@@ -57,19 +57,19 @@ function limiter(data, limit, offset, type) {
   const result = {
     links: {
       self: {
-        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}&${type}`,
+        href: `https://hopverkefni.herokuapp.com/books?offset=${offset}&limit=${limit}&${type}`,
       },
     },
     items: data,
   };
   if (offset > 0) {
     result.links.prev = {
-      href: `http://localhost:${port}/books?offset=${offset - limit}&limit=${limit}&${type}`,
+      href: `https://hopverkefni.herokuapp.com/books?offset=${offset - limit}&limit=${limit}&${type}`,
     };
   }
   if (data.length >= limit) {
     result.links.next = {
-      href: `http://localhost:${port}/books?offset=${Number(offset) + limit}&limit=${limit}&${type}`,
+      href: `https://hopverkefni.herokuapp.com/books?offset=${Number(offset) + limit}&limit=${limit}&${type}`,
     };
   }
   return result;
