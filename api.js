@@ -119,7 +119,7 @@ router.post(
     }
     const user = await users.findByUsername(username);
     if (user) {
-      felki = ['User already exists'];
+      felki =[{error:'User already exists'}];
       return res.status(401).json({ error: felki });
     }
     await users.createUser(username, password, name);
