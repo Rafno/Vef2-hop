@@ -194,7 +194,7 @@ async function patchBooksById(res, {
  * @param {any} res
  */
 async function getBooksById(id, res) {
-  const q = 'SELECT title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books Where id = $1';
+  const q = 'SELECT id,title, author, description, isbn10, isbn13, published, pagecount, language, category FROM books Where id = $1';
   const svar = await query(q, [id]);
 
   if (svar.rowCount > 0) {
