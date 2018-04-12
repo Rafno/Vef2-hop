@@ -25,7 +25,7 @@ router.use(express.json());
 const {
   PORT: port = 3000,
   JWT_SECRET: jwtSecret,
-  TOKEN_LIFETIME: tokenLifetime = 1200,
+  TOKEN_LIFETIME: tokenLifetime = 12000000,
 } = process.env;
 
 if (!jwtSecret) {
