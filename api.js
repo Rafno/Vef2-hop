@@ -25,7 +25,7 @@ router.use(express.json());
 const {
   PORT: port = 3000,
   JWT_SECRET: jwtSecret,
-  TOKEN_LIFETIME: tokenLifetime = 100000,
+  TOKEN_LIFETIME: tokenLifetime = 12000000,
 } = process.env;
 
 if (!jwtSecret) {
@@ -57,19 +57,19 @@ function limiter(data, limit, offset, type) {
   const result = {
     links: {
       self: {
-        href: `http://localhost:${port}/books?offset=${offset}&limit=${limit}&${type}`,
+        href: `https://verkefni2server.herokuapp.com/books?offset=${offset}&limit=${limit}&${type}`,
       },
     },
     items: data,
   };
   if (offset > 0) {
     result.links.prev = {
-      href: `http://localhost:${port}/books?offset=${offset - limit}&limit=${limit}&${type}`,
+      href: `https://verkefni2server.herokuapp.com/books?offset=${offset - limit}&limit=${limit}&${type}`,
     };
   }
   if (data.length >= limit) {
     result.links.next = {
-      href: `http://localhost:${port}/books?offset=${Number(offset) + limit}&limit=${limit}&${type}`,
+      href: `https://verkefni2server.herokuapp.com/books?offset=${Number(offset) + limit}&limit=${limit}&${type}`,
     };
   }
   return result;
@@ -119,7 +119,8 @@ router.post(
     }
     const user = await users.findByUsername(username);
     if (user) {
-      return res.status(401).json({ error: 'User already exists' });
+      felki =[{error:'User already exists'}];
+      return res.status(401).json({ error: felki });
     }
     await users.createUser(username, password, name);
     return res.status(201).json({ Success: `${username} has been created` });
