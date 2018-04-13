@@ -160,4 +160,5 @@ module.exports = {
   errorHandler,
   postBooksError,
   postCategoriesError,
+  testBookTemplate,
 };
