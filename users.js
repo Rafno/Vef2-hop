@@ -161,12 +161,12 @@ async function addReadBook(bookId, title, grade, judge) {
  * @param {int} bookId
  */
 async function deleteReadBook(bookId) {
-  let q = 'SELECT booksread_id FROM booksread WHERE booksread_id = $1';
+  let q = 'SELECT id FROM booksread WHERE id = $1';
   let result = await query(q, [bookId]);
   if (result.rowCount === 0) {
     return null;
   }
-  q = 'DELETE from booksread WHERE booksread_id = $1';
+  q = 'DELETE from booksread WHERE id = $1';
   result = await query(q, [bookId]);
   return result.rows;
 }
