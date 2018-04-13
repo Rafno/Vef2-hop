@@ -213,7 +213,7 @@ router.post('/users/me/read', requireAuthentication, async (req, res) => {
   const books = await users.addReadBook(req.user.id, title, grade, judge);
   return res.status(200).json({ books });
 });
-// DELETE eydir lesni bok.
+// DELETE eydir lesni bok.sss
 router.delete('/users/me/read/:id', requireAuthentication, async (req, res) => {
   const { id } = req.params;
   const books = await users.deleteReadBook(id);
