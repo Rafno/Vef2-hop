@@ -134,7 +134,7 @@ async function readBooks(id, limit, offset) {
   if (!findById(id)) {
     return null;
   }
-  const q = 'SELECT booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1 ORDER BY booksread_title limit $2 offset $3;';
+  const q = 'SELECT id, booksread_id, booksread_title, booksread_grade, booksread_judge FROM booksread where booksread_id = $1 ORDER BY booksread_title limit $2 offset $3;';
   const result = await query(q, [id, limit, offset]);
 
   if (result.rowCount === 0) {

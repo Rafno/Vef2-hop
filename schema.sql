@@ -88,12 +88,12 @@ FOREIGN KEY(category) REFERENCES categories(categoriesname)
  * Domur notanda, lengri texti, ekki krafist
 */
 create table booksread(
-id integer NOT NULL,
+id serial PRIMARY key,
 booksread_id serial,
 booksread_title varchar(99) NOT NULL,
 booksread_grade INT CHECK (booksread_grade >0 AND booksread_grade < 6) NOT NULL,
 booksread_judge TEXT,
-FOREIGN KEY (id) REFERENCES users (id),
+FOREIGN KEY (booksread_id) REFERENCES users (id),
 FOREIGN KEy (booksread_title) REFERENCES books (title)
 );
 
