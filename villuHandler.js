@@ -117,7 +117,7 @@ function errorHandler(username, password, name) {
  * Skilar incorrect format ef eitthvad passar ekki upp.
  * @param {any} data
  */
-/*
+
 function testBookTemplate(data) {
   const fylki = [];
   if (!(Object.prototype.hasOwnProperty.call(data, 'title'))) {
@@ -155,7 +155,7 @@ function testBookTemplate(data) {
   }
   return fylki;
 }
-*/
+
 module.exports = {
   errorHandler,
   postBooksError,
