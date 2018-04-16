@@ -55,7 +55,7 @@ async function findByUsername(username) {
  * @param {int} offset
  */
 async function findAll(limit, offset) {
-  const q = 'SELECT username, name FROM users ORDER BY name limit $1 offset $2';
+  const q = 'SELECT username, name FROM users ORDER BY id limit $1 offset $2';
 
   const result = await query(q, [limit, offset]);
   if (result.rowCount > 0) {
